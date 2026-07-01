@@ -131,6 +131,6 @@ Define the reference condition first. Each row changes exactly one factor, share
 
 ## Role Discipline
 
-If the user explicitly requests multi-agent or delegated work, use these roles: Coordinator, Engineer, Reviewer, Analyst, Writer, and optional Theorist. Keep Engineer and Reviewer separate for non-trivial changes; keep Analyst and Writer separate by default when making paper claims.
+If the user explicitly requests multi-agent, delegated, or role-scoped work, use these roles: Coordinator, Engineer, Reviewer, Analyst, Writer, and optional Theorist. Read `references/roles.md` before assigning or executing role-specific work.
 
-If no delegation is requested, still apply the same role criteria internally: implement as Engineer, then review the diff and evidence as Reviewer before presenting conclusions.
+Keep Engineer and Reviewer separate for non-trivial changes; keep Analyst and Writer separate by default when making paper claims. If no delegation is requested, still apply the same role criteria internally: implement as Engineer, then review the diff and evidence as Reviewer before presenting conclusions.
