@@ -1,0 +1,12 @@
+# Local/editor files
+.DS_Store
+.idea/
+.vscode/
+
+# Python/cache files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Codex/runtime scratch
+.codex/tmp/

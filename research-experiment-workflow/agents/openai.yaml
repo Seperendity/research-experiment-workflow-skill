@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research Experiment Workflow"
+  short_description: "Artifact-gated research experiment workflow"
+  default_prompt: "Use $research-experiment-workflow to score this research idea, check novelty risk, and turn it into a gated experiment plan with reviewable artifacts."
