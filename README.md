@@ -13,6 +13,7 @@ This skill helps Codex act less like an eager code generator and more like a dis
 - **A staged research workflow**: idea scoring, hypothesis, novelty check, feasibility, pilot, experiment run, review, analysis, and writing.
 - **Durable experiment artifacts**: templates for `ideas.json`, `NOVELTY.md`, `FEASIBILITY.md`, `PILOT.md`, `run_notes.md`, `results/summary.json`, `REVIEW.md`, and `analysis.md`.
 - **Paper-aware guardrails**: baseline checks, novelty risk, leakage checks, metric misuse, post-hoc selection, review rubric, and writing integrity checks.
+- **Complete paper-writing guidance**: reviewer-facing guidance for Abstract, Introduction, Related Work, Method, Experiments, Conclusion, paragraph flow, figure/table presentation, claim-evidence maps, and adversarial self-review.
 - **Cross-project reuse**: project-specific commands and metrics stay in each repo; the reusable skill keeps the process consistent.
 
 ## Installation
@@ -54,10 +55,15 @@ research-experiment-workflow/
     openai.yaml
   references/
     artifact-contract.md
+    roles.md
+    paper-writing.md
+    paper-writing-*.md
 ```
 
 - `SKILL.md` defines the stage router, gates, role discipline, and operating principles.
 - `references/artifact-contract.md` defines the artifact schema, compact templates, review rubric, and writing checks.
+- `references/paper-writing.md` routes paper drafting, section revision, paragraph-flow checks, figure/table presentation, claim-evidence mapping, and paper self-review.
+- `references/paper-writing-*.md` contains section-specific writing guides and flattened example banks adapted from `Master-cai/Research-Paper-Writing-Skills`.
 - `agents/openai.yaml` provides Codex UI metadata and a default prompt.
 
 ## Example: Starting A New Experiment Project
@@ -145,6 +151,14 @@ Use $research-experiment-workflow to draft the experiment section for a paper or
 Every number must cite the experiment id, summary.json, or analysis.md.
 ```
 
+For reviewer-facing paper prose, ask for the specific section and keep evidence constraints explicit:
+
+```text
+Use $research-experiment-workflow to draft the Abstract and Introduction from the reviewed analysis.md and NOVELTY.md.
+Use the paper-writing guidance. Include a mini-outline, paragraph roles, claim-evidence map, and open evidence gaps.
+Do not invent numbers, baselines, citations, figures, or conclusions.
+```
+
 ## Design Principles
 
 - **Baseline first**: do not claim improvement until a baseline is reproduced or explicitly replaced.
@@ -155,8 +169,10 @@ Every number must cite the experiment id, summary.json, or analysis.md.
 
 ## Inspiration
 
-The skill borrows useful workflow ideas from artifact-driven research practice and AI-Scientist-style systems, including idea scoring, novelty checks, experiment budgets, run notes, review rubrics, and writing integrity checks. It is intentionally a human-controlled workflow gatekeeper, not a fully automated paper generator.
+The skill borrows useful workflow ideas from artifact-driven research practice and AI-Scientist-style systems, including idea scoring, novelty checks, experiment budgets, run notes, review rubrics, and writing integrity checks. Its paper-writing references adapt the MIT-licensed `Master-cai/Research-Paper-Writing-Skills` skill, whose README credits Prof. Peng Sida's open study notes as the primary source of writing methodology. This skill is intentionally a human-controlled workflow gatekeeper, not a fully automated paper generator.
 
 ## License
 
 This repository currently has no open-source license. Add a `LICENSE` file before accepting external contributions or granting reuse rights beyond normal public viewing.
+
+The `research-experiment-workflow/references/paper-writing-*` files include adapted material from the MIT-licensed `Master-cai/Research-Paper-Writing-Skills` repository. See `references/paper-writing-attribution.md` for the copied MIT notice and source attribution.

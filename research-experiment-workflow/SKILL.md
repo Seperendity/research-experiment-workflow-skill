@@ -1,6 +1,6 @@
 ---
 name: research-experiment-workflow
-description: Artifact-gated workflow for research, machine learning, and paper-oriented experiments. Use when Codex needs to turn an idea into a scored research direction, check novelty, assess feasibility, run a pilot, execute or debug an experiment, review evidence, analyze results, plan ablations, or draft paper text with claims traceable to saved artifacts.
+description: Artifact-gated workflow for research, machine learning, and paper-oriented experiments. Use when Codex needs to turn an idea into a scored research direction, check novelty, assess feasibility, run a pilot, execute or debug an experiment, review evidence, analyze results, plan ablations, draft or revise reviewer-facing paper sections, improve paragraph flow, align claims with evidence, polish figures/tables, or run paper self-review with claims traceable to saved artifacts.
 ---
 
 # Research Experiment Workflow
@@ -9,7 +9,7 @@ description: Artifact-gated workflow for research, machine learning, and paper-o
 
 Use this skill to keep research work artifact-driven: each stage must leave a durable file that the next stage consumes. Prefer small, falsifiable experiments over broad implementation, and do not turn observations into paper claims until the evidence package has passed the relevant gates.
 
-For exact artifact templates, summary schema, project interface contracts, and writing integrity checks, read `references/artifact-contract.md` when creating or validating experiment artifacts.
+For exact artifact templates, summary schema, project interface contracts, and writing integrity checks, read `references/artifact-contract.md` when creating or validating experiment artifacts. For paper drafting, revision, paragraph flow, figure/table presentation, and self-review, read `references/paper-writing.md` first, then load only the section-specific writing reference needed for the current target.
 
 ## First Actions
 
@@ -31,10 +31,10 @@ For exact artifact templates, summary schema, project interface contracts, and w
 | Small proof, smoke test, minimal run, config sanity check | Pilot |
 | Full run, scaled run, saved metrics, result package | Experiment run |
 | Failure, NaN, shape mismatch, broken pipeline, missing artifact | Debug |
-| Independent check, code review, result validation, paper evidence audit | Review |
+| Independent check, code review, result validation, paper evidence audit, paper self-review | Review |
 | Metric interpretation, statistics, tables, figures, comparison | Analysis |
-| Paper section, abstract claim, story, related result paragraph | Writing |
-| Claim roadmap, figure plan, paper narrative | Paper story |
+| Paper section, abstract claim, paragraph flow, section rewrite, related result paragraph | Writing |
+| Claim roadmap, figure plan, paper narrative, section outline | Paper story |
 | Controlled comparison, one-factor removal, table row suite | Ablation |
 
 ## Canonical Pipeline
@@ -93,7 +93,7 @@ Gate: the failure is explained and either fixed or recorded as a blocker with ne
 
 ### Review
 
-Review as an independent reviewer: prioritize correctness, regressions, unsupported claims, missing controls, artifact gaps, reproducibility issues, novelty risk, metric misuse, leakage, and post-hoc selection. Report `PASS`, `WARNING`, or `FAIL`, plus conference-style rubric scores when the work is paper-facing.
+Review as an independent reviewer: prioritize correctness, regressions, unsupported claims, missing controls, artifact gaps, reproducibility issues, novelty risk, metric misuse, leakage, and post-hoc selection. For paper-facing review, also read `references/paper-writing-review.md` and check contribution, writing clarity, experimental strength, evaluation completeness, and method design soundness. Report `PASS`, `WARNING`, or `FAIL`, plus conference-style rubric scores when the work is paper-facing.
 
 Gate: blocking issues are fixed before downstream analysis or writing; accepted warnings must be explicitly recorded.
 
@@ -105,13 +105,13 @@ Gate: claims are tied to metrics, figures, statistics, artifacts, or citations.
 
 ### Writing
 
-Draft only from confirmed evidence. Every quantitative or comparative claim must point to an experiment ID, analysis artifact, figure, table, or citation. Before writing final prose, check that referenced figures, tables, citations, numbers, and section placeholders are present and consistent.
+Read `references/paper-writing.md` first, then load only the target section guide: Abstract, Introduction, Related Work, Method, Experiments, Conclusion, paragraph flow, review, or examples as needed. Draft only from confirmed evidence. Every quantitative, comparative, novelty, or causal claim must point to an experiment ID, analysis artifact, figure, table, or citation. Return or save a compact outline, paragraph roles, self-review checklist, and claim-evidence map. Before writing final prose, check that referenced figures, tables, citations, numbers, and section placeholders are present and consistent.
 
-Gate: no invented numbers, unsupported baselines, missing figures, missing citations, leftover placeholders, duplicate sections, or unreviewed conclusions.
+Gate: no invented numbers, unsupported baselines, missing figures, missing citations, unresolved `needs evidence` claims, leftover placeholders, duplicate sections, or unreviewed conclusions.
 
 ### Paper Story
 
-Define the one-sentence contribution, core claims, planned figures, required validations, and open evidence gaps. Link each proposed claim to a completed or planned artifact.
+Read `references/paper-writing.md` when the story is paper-facing. Define the one-sentence contribution, core claims, planned figures, required validations, section outline, and open evidence gaps. Link each proposed claim to a completed or planned artifact, citation, or explicit future validation. Treat missing evidence as a story gap, not as prose to smooth over.
 
 ### Ablation
 

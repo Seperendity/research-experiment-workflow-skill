@@ -13,6 +13,7 @@
 - **稳定的研究流程**：覆盖 idea scoring、hypothesis、novelty check、feasibility、pilot、experiment run、review、analysis、writing。
 - **可恢复的实验记录**：提供 `ideas.json`、`NOVELTY.md`、`FEASIBILITY.md`、`PILOT.md`、`run_notes.md`、`results/summary.json`、`REVIEW.md`、`analysis.md` 等 artifact 模板。
 - **面向论文的防护栏**：检查 baseline、公平比较、新颖性风险、数据泄漏、指标误用、事后筛选、审稿 rubric 和写作完整性。
+- **完整论文写作指导**：覆盖 Abstract、Introduction、Related Work、Method、Experiments、Conclusion、段落流畅性、图表表达、claim-evidence map 和投稿前对抗式自审。
 - **跨项目复用**：具体命令、数据路径和指标留在每个项目里；这个 skill 只负责稳定流程和阶段门。
 
 ## 安装
@@ -54,10 +55,15 @@ research-experiment-workflow/
     openai.yaml
   references/
     artifact-contract.md
+    roles.md
+    paper-writing.md
+    paper-writing-*.md
 ```
 
 - `SKILL.md` 定义阶段路由、阶段门、角色纪律和操作原则。
 - `references/artifact-contract.md` 定义 artifact schema、紧凑模板、review rubric 和写作检查。
+- `references/paper-writing.md` 负责论文起草、章节改写、段落流畅性检查、图表表达、claim-evidence map 和论文自审的路由。
+- `references/paper-writing-*.md` 包含来自 `Master-cai/Research-Paper-Writing-Skills` 的章节写作指南和扁平化 example bank。
 - `agents/openai.yaml` 提供 Codex UI 元信息和默认 prompt。
 
 ## 示例：一个新项目如何开始实验
@@ -145,6 +151,14 @@ research/
 所有数字必须引用 experiment id、summary.json 或 analysis.md。
 ```
 
+如果要写面向审稿人的论文正文，请明确章节和证据约束：
+
+```text
+使用 $research-experiment-workflow，基于已通过 review 的 analysis.md 和 NOVELTY.md 起草 Abstract 和 Introduction。
+请使用 paper-writing 写作指南，输出 mini-outline、paragraph roles、claim-evidence map 和 open evidence gaps。
+不要编造数字、baseline、引用、图表或结论。
+```
+
 ## 设计原则
 
 - **Baseline first**：没有复现或明确替代 baseline，不声称提升。
@@ -155,8 +169,10 @@ research/
 
 ## 设计来源
 
-这个 skill 借鉴了 artifact-driven research workflow 和 AI-Scientist 类系统中的 idea scoring、novelty check、实验预算、run notes、自动审稿 rubric 和写作完整性检查，但它有意保持为人工可控的流程守门员，而不是全自动论文生成器。
+这个 skill 借鉴了 artifact-driven research workflow 和 AI-Scientist 类系统中的 idea scoring、novelty check、实验预算、run notes、自动审稿 rubric 和写作完整性检查。论文写作 reference 改编自 MIT 授权的 `Master-cai/Research-Paper-Writing-Skills`，其 README 说明主要写作方法来自 Prof. Peng Sida 的公开学习笔记。本 skill 有意保持为人工可控的流程守门员，而不是全自动论文生成器。
 
 ## 许可证
 
 当前仓库未附带开源许可证。公开分享或接受外部贡献前，建议按你的授权意愿添加 `LICENSE` 文件。
+
+`research-experiment-workflow/references/paper-writing-*` 文件包含改编自 MIT 授权仓库 `Master-cai/Research-Paper-Writing-Skills` 的材料。复制的 MIT notice 和来源说明见 `references/paper-writing-attribution.md`。

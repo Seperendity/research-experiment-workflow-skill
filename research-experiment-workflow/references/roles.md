@@ -59,6 +59,7 @@ Responsibilities:
 - Check correctness, regressions, reproducibility gaps, artifact completeness, and baseline fairness.
 - Check for data leakage, metric misuse, invalid comparisons, cherry-picking, and post-hoc selection.
 - Review whether claims are supported by saved artifacts and whether warnings are acceptable.
+- For paper-facing review, load `references/paper-writing-review.md` and check contribution, writing clarity, experimental strength, evaluation completeness, and method design soundness.
 - Decide `PASS`, `WARNING`, or `FAIL` with blocking issues clearly separated from non-blocking issues.
 
 Out of scope:
@@ -102,10 +103,11 @@ Purpose: Draft paper sections, technical reports, or research summaries from con
 
 Responsibilities:
 
-- Convert reviewed analysis, hypotheses, and literature notes into clear prose.
-- Keep every quantitative or comparative claim mapped to experiment IDs, analysis artifacts, figures, tables, or citations.
+- Load `references/paper-writing.md` and the target section guide before drafting or revising paper prose.
+- Convert reviewed analysis, hypotheses, and literature notes into clear prose with a mini-outline, paragraph roles, and stable terminology.
+- Keep every quantitative, comparative, novelty, or causal claim mapped to experiment IDs, analysis artifacts, figures, tables, or citations.
 - Preserve uncertainty, limitations, failed runs, and unresolved evidence gaps when they affect interpretation.
-- Run the writing integrity checklist before presenting prose as paper-ready.
+- Run the writing integrity checklist and claim-evidence map before presenting prose as paper-ready.
 
 Out of scope:
 
@@ -116,7 +118,9 @@ Out of scope:
 Required outputs:
 
 - Draft files under the project's paper or report directory.
+- Mini-outline and paragraph-role map for drafted sections.
 - Claim-to-evidence mapping.
+- Self-review checklist.
 - Open evidence gaps or TODOs when the evidence is incomplete.
 
 ## Theorist

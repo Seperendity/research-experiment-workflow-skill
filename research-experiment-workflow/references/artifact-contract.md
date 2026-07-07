@@ -299,6 +299,21 @@ Use `null` only when the field is not applicable and explain the reason in `warn
 ```markdown
 # <section title>
 
+## Target Section Guide
+
+- Writing reference: references/paper-writing.md
+- Section-specific reference: <paper-writing-abstract.md | paper-writing-introduction.md | paper-writing-related-work.md | paper-writing-method.md | paper-writing-experiments.md | paper-writing-conclusion.md | paper-writing-flow.md>
+
+## Mini Outline
+
+1. <3-7 bullets covering the section logic before prose>
+
+## Paragraph Roles
+
+| Paragraph | Role | One-message sentence | Evidence |
+|---|---|---|---|
+| P1 | opening/challenge/method/advantage/evidence/limitation | | |
+
 ## Main Point
 
 <one-sentence takeaway>
@@ -310,9 +325,23 @@ Use `null` only when the field is not applicable and explain the reason in `warn
 - Figures or tables: <list>
 - Citations: <list>
 
+## Claim-Evidence Map
+
+| Claim | Evidence | Status |
+|---|---|---|
+| <major claim> | <artifact, figure, table, or citation> | supported/needs evidence |
+
 ## Draft
 
 <write the prose here>
+
+## Self-Review Checklist
+
+- [ ] Each paragraph has one explicit message.
+- [ ] The first sentence states the paragraph role or message.
+- [ ] Terminology is stable and key nouns are self-contained.
+- [ ] Major Abstract/Introduction claims are mapped to evidence.
+- [ ] Figure and table captions support the intended claim.
 
 ## Open Evidence Gaps
 
@@ -326,6 +355,11 @@ Before presenting paper text as final or paper-ready, verify:
 - Every number appears in `results/summary.json`, `analysis.md`, a table, or a cited artifact.
 - Every figure and table reference points to an existing file or generated output.
 - Every citation key or reference is present in the bibliography or literature note.
+- Every major Abstract or Introduction claim appears in the claim-evidence map.
+- Every paragraph has one explicit message and a topic sentence that maps to the section outline.
+- Terminology is stable; key nouns are self-contained before reuse.
+- Figure and table captions explain the setting, notation, and main message without hiding protocol gaps.
+- Tables use readable, minimal-ink formatting with metric direction and consistent precision when applicable.
 - No placeholders remain, including `TODO`, `TBD`, `XX`, `Conclusions Here`, or dummy citations.
 - Sections are not duplicated and headings match the target outline.
 - Negative, failed, or discarded runs are disclosed when they affect interpretation.
@@ -338,7 +372,7 @@ Before presenting paper text as final or paper-ready, verify:
 - Experiment failed silently but still produced partial artifacts.
 - Metrics are misused, cherry-picked, or compared against a stale baseline.
 - Data leakage, benchmark contamination, or post-hoc selection bias.
-- Paper draft contains hallucinated numbers, missing figures, stale citations, or overclaimed conclusions.
+- Paper draft contains hallucinated numbers, missing figures, stale citations, weak paragraph flow, untracked terminology shifts, or overclaimed conclusions.
 
 ## Cross-Project Adaptation Checklist
 

@@ -16,6 +16,8 @@ The root documentation is for humans who install or maintain the skill. The `res
 - `research-experiment-workflow/SKILL.md`: required skill entrypoint, frontmatter, stage router, and concise operating rules.
 - `research-experiment-workflow/references/artifact-contract.md`: artifact schemas, compact templates, review rubric, writing checks, and cross-project adaptation guidance.
 - `research-experiment-workflow/references/roles.md`: role model for multi-agent, delegated, or role-scoped research work.
+- `research-experiment-workflow/references/paper-writing.md`: paper-writing router adapted from `Master-cai/Research-Paper-Writing-Skills`.
+- `research-experiment-workflow/references/paper-writing-*.md`: section-specific paper-writing guides, flattened example banks, flow checks, review checklist, and attribution.
 - `research-experiment-workflow/agents/openai.yaml`: UI metadata and default prompt.
 - `README.md`: English public-facing README.
 - `README.zh-CN.md`: Simplified Chinese public-facing README.
@@ -31,8 +33,9 @@ When maintaining this repository, load context in this order:
 1. `AGENTS.md`
 2. `research-experiment-workflow/SKILL.md`
 3. Relevant files in `research-experiment-workflow/references/`
-4. `research-experiment-workflow/agents/openai.yaml` when UI metadata or default prompts change
-5. `README.md` and `README.zh-CN.md` when public documentation changes
+4. `research-experiment-workflow/references/paper-writing.md` and the relevant `paper-writing-*.md` files when writing behavior changes
+5. `research-experiment-workflow/agents/openai.yaml` when UI metadata or default prompts change
+6. `README.md` and `README.zh-CN.md` when public documentation changes
 
 Do not assume hidden workflow loading. All maintenance rules that matter should be visible in repository files.
 
@@ -80,6 +83,7 @@ The secret scan is a lightweight guardrail, not a substitute for judgment.
 - If `SKILL.md` trigger behavior changes, review `agents/openai.yaml` and update the default prompt if stale.
 - If roles change, update `references/roles.md`; keep only a short loading rule in `SKILL.md`.
 - If artifact schemas or templates change, update `references/artifact-contract.md` and consider whether README examples still match.
+- If paper-writing guidance changes, keep `references/paper-writing-attribution.md` and README attribution accurate.
 - Prefer small, focused commits with clear messages.
 
 ## Release And GitHub Workflow
@@ -99,6 +103,7 @@ Do not rewrite public history unless the user explicitly asks for it. If a push 
 ## License And Safety
 
 - This repository currently has no open-source license unless a `LICENSE` file is added. Do not imply reuse rights beyond what the repository explicitly grants.
+- The `paper-writing-*` references include adapted MIT-licensed material from `Master-cai/Research-Paper-Writing-Skills`; preserve the included notice and attribution when editing those files.
 - Do not commit tokens, private endpoints, local machine paths that expose secrets, unpublished paper data, or private experiment results.
 - Keep examples generic and safe to share publicly.
 
