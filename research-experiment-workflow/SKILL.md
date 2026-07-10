@@ -1,6 +1,6 @@
 ---
 name: research-experiment-workflow
-description: Artifact-gated workflow for research, machine learning, and paper-oriented experiments. Use when Codex needs to turn an idea into a scored research direction, check novelty, assess feasibility, run a pilot, execute or debug an experiment, review evidence, analyze results, plan ablations, draft or revise reviewer-facing paper sections, improve paragraph flow, align claims with evidence, polish figures/tables, or run paper self-review with claims traceable to saved artifacts.
+description: Artifact-gated workflow for research, machine learning, and paper-oriented experiments. Use when Codex needs to turn an idea into a scored research direction, check novelty, assess feasibility, lock an experiment protocol, run or debug an experiment, review evidence, analyze results, decide the next research action, plan ablations, or draft reviewer-facing paper content with claims traceable to saved artifacts.
 ---
 
 # Research Experiment Workflow
@@ -9,16 +9,17 @@ description: Artifact-gated workflow for research, machine learning, and paper-o
 
 Use this skill to keep research work artifact-driven: each stage must leave a durable file that the next stage consumes. Prefer small, falsifiable experiments over broad implementation, and do not turn observations into paper claims until the evidence package has passed the relevant gates.
 
-For exact artifact templates, summary schema, project interface contracts, and writing integrity checks, read `references/artifact-contract.md` when creating or validating experiment artifacts. For paper drafting, revision, paragraph flow, figure/table presentation, and self-review, read `references/paper-writing.md` first, then load only the section-specific writing reference needed for the current target.
+For exact artifact templates, state and result schemas, project interface contracts, and writing integrity checks, read `references/artifact-contract.md` when creating or validating experiment artifacts. For paper drafting, revision, paragraph flow, figure/table presentation, and self-review, read `references/paper-writing.md` first, then load only the section-specific writing reference needed for the current target.
 
 ## First Actions
 
 1. Load the repository's project instructions if present (`AGENTS.md`, `CLAUDE.md`, `README.md`, or equivalent), then inspect relevant playbooks, templates, experiment directories, and code.
-2. Identify the current stage from the user request and existing artifacts. Resume from the latest valid artifact instead of restarting.
+2. Identify the current stage from the user request and existing artifacts. When `experiment.json` exists, use its stage, gate records, and artifact paths to resume from the latest valid artifact instead of restarting.
 3. Choose the smallest stage that handles the request. Use the full pipeline only when the user asks for end-to-end research execution.
 4. Enforce gates: advance only when the previous gate passes, or when the user explicitly accepts a recorded warning.
-5. Keep domain-specific details in project files. The reusable workflow is the stage order, artifact contract, and evidence discipline.
-6. If an agent will execute generated or modified code, check the project's sandbox, dependency, network, and budget limits before running it.
+5. For version 2 experiment directories, run `scripts/validate_experiment.py <experiment-dir>` after gate or status changes; use `--strict` for new experiments.
+6. Keep domain-specific details in project files. The reusable workflow is the stage order, artifact contract, and evidence discipline.
+7. If an agent will execute generated or modified code, check the project's sandbox, dependency, network, and budget limits before running it.
 
 ## Stage Router
 
@@ -28,11 +29,13 @@ For exact artifact templates, summary schema, project interface contracts, and w
 | New intuition, mechanism, or research question | Hypothesis |
 | Prior art, related work, whether the idea is already known | Novelty check |
 | "Is this worth doing?", scope, data availability, compute risk | Feasibility |
+| Evaluation rules, controls, data boundaries, budget, stopping or selection policy | Protocol lock |
 | Small proof, smoke test, minimal run, config sanity check | Pilot |
 | Full run, scaled run, saved metrics, result package | Experiment run |
 | Failure, NaN, shape mismatch, broken pipeline, missing artifact | Debug |
 | Independent check, code review, result validation, paper evidence audit, paper self-review | Review |
 | Metric interpretation, statistics, tables, figures, comparison | Analysis |
+| Replicate, ablate, revise, scale, debug, or stop after analysis | Decision |
 | Paper section, abstract claim, paragraph flow, section rewrite, related result paragraph | Writing |
 | Claim roadmap, figure plan, paper narrative, section outline | Paper story |
 | Controlled comparison, one-factor removal, table row suite | Ablation |
@@ -41,9 +44,9 @@ For exact artifact templates, summary schema, project interface contracts, and w
 
 Run the standard loop as:
 
-`idea scoring -> hypothesis -> novelty check -> feasibility -> pilot -> experiment run -> review -> analysis -> writing`
+`idea scoring -> hypothesis -> novelty check -> feasibility -> protocol lock -> pilot -> experiment run -> review -> analysis -> decision`
 
-Use `debug` whenever a pilot or run fails. Use `paper story` to organize claims before writing. Use `ablation` only after the reference model or primary condition is defined.
+After `decision`, follow exactly one recorded branch: `REPLICATE`, `ABLATE`, `REVISE`, `SCALE`, `DEBUG`, or `STOP`. Route failures through `debug`; route revised hypotheses or protocols back through the affected gates. Use `paper story` and `writing` only after reviewed analysis. Use `ablation` only after the reference condition and shared protocol are locked.
 
 The first two stages are lightweight. Skip `idea scoring` when the user gives a concrete hypothesis. Skip `novelty check` only for engineering-only work, local reproduction, or when the user explicitly accepts the literature risk.
 
@@ -73,27 +76,33 @@ Assess data availability, dependencies, code path, baseline, compute cost, budge
 
 Gate: proceed only on `GO` or on `CONDITIONAL-GO` after conditions are resolved or explicitly accepted.
 
+### Protocol Lock
+
+Record the research question, primary metric and direction, baseline or control, data and evaluation boundaries, run budget, stopping rule, allowed change surface, and success or failure decision rule in `PROTOCOL.md`. Keep the protocol domain-neutral; place domain-specific checks in project files. Record accepted exceptions as warnings rather than silently changing the protocol.
+
+Gate: proceed only when the protocol is `LOCKED`, or when an explicit `WARNING` is accepted and recorded. Any later material change invalidates downstream artifacts until the affected stages are rerun.
+
 ### Pilot
 
 Run the shortest meaningful test that can validate build health, forward shapes, finite loss or metric health, artifact generation, and the specific change being tested.
 
-Gate: mark `PASS` only if the model or pipeline builds, outputs valid shapes or schemas, has no NaN/Inf or empty artifacts, and passes the change-specific sanity check.
+Gate: mark `PASS` only if the locked protocol is still applicable, the model or pipeline builds, outputs valid shapes or schemas, has no NaN/Inf or empty artifacts, and passes the change-specific sanity check.
 
 ### Experiment Run
 
 Run the smallest scale that answers the question. Save config snapshots, metrics, logs, figures or arrays, run notes, and `results/summary.json`. Record budget limits, timeout, retry count, seeds, and stopping conditions.
 
-Gate: training or evaluation completed, artifacts exist, and summary includes baseline comparison or an explicit explanation for why no baseline applies.
+Gate: training or evaluation completed under the locked protocol, artifacts exist, and the summary includes the planned baseline comparison or the protocol's recorded reason that no baseline applies.
 
 ### Debug
 
-Reproduce the failure with the smallest meaningful case. Isolate data, model, training loop, config, infrastructure, or artifact-generation causes. Fix and rerun the smallest relevant check, then update the failed pilot or run artifact.
+Reproduce the failure with the smallest meaningful case. Isolate data, model, training loop, config, infrastructure, or artifact-generation causes. Record the diagnosis, affected artifacts, retry budget, and next action in `DEBUG.md`. Fix and rerun the smallest relevant check, then update or invalidate the failed pilot or run artifact.
 
 Gate: the failure is explained and either fixed or recorded as a blocker with next action. Stop after the recorded retry or budget limit unless the user extends it.
 
 ### Review
 
-Review as an independent reviewer: prioritize correctness, regressions, unsupported claims, missing controls, artifact gaps, reproducibility issues, novelty risk, metric misuse, leakage, and post-hoc selection. For paper-facing review, also read `references/paper-writing-review.md` and check contribution, writing clarity, experimental strength, evaluation completeness, and method design soundness. Report `PASS`, `WARNING`, or `FAIL`, plus conference-style rubric scores when the work is paper-facing.
+Review as an independent reviewer: prioritize correctness, protocol adherence, regressions, unsupported claims, missing controls, artifact gaps, reproducibility issues, novelty risk, metric misuse, leakage, and post-hoc selection. Review the protocol before expensive or paper-relevant runs and review the evidence package after execution. For paper-facing review, also read `references/paper-writing-review.md` and check contribution, writing clarity, experimental strength, evaluation completeness, and method design soundness. Report `PASS`, `WARNING`, or `FAIL`, plus conference-style rubric scores when the work is paper-facing.
 
 Gate: blocking issues are fixed before downstream analysis or writing; accepted warnings must be explicitly recorded.
 
@@ -102,6 +111,12 @@ Gate: blocking issues are fixed before downstream analysis or writing; accepted 
 Load saved metrics and compare against baselines or planned controls. Separate supported claims, unsupported claims, inconclusive results, warnings, and next steps. Avoid selecting only favorable runs unless the selection rule was defined before evaluation.
 
 Gate: claims are tied to metrics, figures, statistics, artifacts, or citations.
+
+### Decision
+
+Use reviewed analysis to record exactly one next action in `DECISION.md`: `REPLICATE`, `ABLATE`, `REVISE`, `SCALE`, `DEBUG`, or `STOP`. Cite the evidence, name the destination stage or experiment, and state whether existing downstream artifacts remain valid.
+
+Gate: do not start another run or present the experiment as complete until the decision and its rationale are recorded.
 
 ### Writing
 
@@ -115,11 +130,12 @@ Read `references/paper-writing.md` when the story is paper-facing. Define the on
 
 ### Ablation
 
-Define the reference condition first. Each row changes exactly one factor, shares the same evaluation protocol, and is handed to review and analysis before writing conclusions.
+Define the reference condition and rows in `ABLATION_PLAN.md` before execution. Each row changes exactly one factor unless an interaction study is explicitly declared, shares the locked evaluation protocol, and is handed to review and analysis before conclusions.
 
 ## Operating Principles
 
 - Baseline-first: do not claim improvement until the baseline is reproduced, replaced with justification, or explicitly marked unavailable.
+- Protocol-first: lock evaluation boundaries and decision rules before running a result-bearing experiment.
 - Novelty-first for paper claims: do not present a contribution until close prior work has been checked or the uncertainty is disclosed.
 - Pilot-first: do not scale a major change until a minimal pilot passes.
 - Budget-first: define timeout, retry count, run count, and stopping conditions before expensive execution.
@@ -127,10 +143,11 @@ Define the reference condition first. Each row changes exactly one factor, share
 - Compatibility-first: preserve the existing baseline path unless the task explicitly changes it.
 - Artifact-first: prefer updating saved experiment files over relying on chat memory.
 - Smallest-test-first: use the cheapest run that can falsify the current question.
+- Test-boundary-first: do not change protected evaluation data or rules in response to observed results without invalidating affected evidence.
 - Safety-first: execute generated or modified code only inside the project's accepted sandbox and dependency policy.
 
 ## Role Discipline
 
 If the user explicitly requests multi-agent, delegated, or role-scoped work, use these roles: Coordinator, Engineer, Reviewer, Analyst, Writer, and optional Theorist. Read `references/roles.md` before assigning or executing role-specific work.
 
-Keep Engineer and Reviewer separate for non-trivial changes; keep Analyst and Writer separate by default when making paper claims. If no delegation is requested, still apply the same role criteria internally: implement as Engineer, then review the diff and evidence as Reviewer before presenting conclusions.
+Keep Engineer and Reviewer separate for non-trivial changes; keep Analyst and Writer separate by default when making paper claims. A same-context self-review is a pre-check, not independent sign-off. When no fresh reviewer is available, record that limitation as a warning instead of claiming independent review.

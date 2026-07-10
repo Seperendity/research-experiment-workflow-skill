@@ -2,6 +2,19 @@
 
 Use this reference when creating, checking, or adapting a research experiment workflow. Keep project-specific names, paths, metrics, commands, and safety policy in the repository; keep the gate structure stable.
 
+## Contents
+
+- [Suggested Project Layout](#suggested-project-layout)
+- [Project Interface Contract](#project-interface-contract)
+- [Stage Gates](#stage-gates)
+- [Experiment Directory Contract](#experiment-directory-contract)
+- [Experiment State](#experiment-state)
+- [`results/summary.json` Version 2](#resultssummaryjson-version-2)
+- [Compact Templates](#compact-templates)
+- [Writing Integrity Checklist](#writing-integrity-checklist)
+- [Common Failure Modes to Check](#common-failure-modes-to-check)
+- [Cross-Project Adaptation Checklist](#cross-project-adaptation-checklist)
+
 ## Suggested Project Layout
 
 Use existing project conventions if they exist. If a project has no research structure, propose this minimal layout before creating many files:
@@ -13,13 +26,18 @@ research/
     tracker.md
   experiments/
     exp-YYYYMMDD-short-name/
+      experiment.json
       README.md
       FEASIBILITY.md
       NOVELTY.md
+      PROTOCOL.md
       PILOT.md
       REVIEW.md
       analysis.md
+      DECISION.md
       run_notes.md
+      DEBUG.md
+      ABLATION_PLAN.md
       config/
       results/
         summary.json
@@ -41,6 +59,7 @@ Each project should define these in `AGENTS.md`, a local playbook, or the experi
 - Plot, analysis, or report-generation command.
 - Expected result schema, metric names, and artifact paths.
 - Seed policy, hardware assumptions, timeout, run budget, and retry budget.
+- Protected data, evaluation boundaries, stopping rules, and allowed change surface.
 - Sandbox, dependency, and network policy for generated or modified code.
 - Paper or report template, citation style, and figure/table conventions if writing is expected.
 
@@ -52,39 +71,108 @@ Each project should define these in `AGENTS.md`, a local playbook, or the experi
 | Hypothesis | `research/hypotheses/tracker.md` entry | Falsifiable hypothesis recorded |
 | Novelty check | `NOVELTY.md` or literature note | Contribution is defensible or risk is accepted |
 | Feasibility | `FEASIBILITY.md` | Verdict is `GO` or resolved/accepted `CONDITIONAL-GO` |
+| Protocol lock | `PROTOCOL.md` | Status is `LOCKED` or an explicit warning is accepted |
 | Pilot | `PILOT.md` | Status is `PASS` |
 | Experiment run | Config snapshot, `run_notes.md`, and `results/summary.json` | Run completed and artifacts saved |
+| Debug | `DEBUG.md` | Failure is fixed, invalidated, or recorded as blocked |
+| Ablation | `ABLATION_PLAN.md` | Reference condition and controlled rows are defined |
 | Review | `REVIEW.md` | Status is `PASS` or accepted `WARNING` |
 | Analysis | `analysis.md` | Supported and unsupported claims are explicit |
+| Decision | `DECISION.md` | Exactly one next action is selected and linked |
 | Writing | Draft under `research/papers/drafts/` | Claims cite artifacts or literature |
 
 ## Experiment Directory Contract
 
-Each completed or paper-relevant experiment should contain:
+Each new experiment should use `experiment.json` as its control-plane record. Each completed or paper-relevant experiment should contain:
 
+- `experiment.json`
 - `README.md`
 - `FEASIBILITY.md`
 - `NOVELTY.md` or a linked literature note when paper claims depend on novelty
+- `PROTOCOL.md`
 - `PILOT.md`
 - `REVIEW.md`
 - Config snapshot or command snapshot
 - `run_notes.md`
 - `results/summary.json`
 - `analysis.md`
+- `DECISION.md`
 
-## `results/summary.json` Minimum Fields
+Add `DEBUG.md` after a failed or interrupted run. Add `ABLATION_PLAN.md` before an ablation suite. Existing experiments without `experiment.json` remain readable legacy experiments; validators should warn rather than fail unless strict mode is requested.
+
+## Experiment State
+
+Use this minimum `experiment.json` structure:
 
 ```json
 {
+  "schema_version": 2,
+  "experiment_id": "exp-YYYYMMDD-short-name",
+  "hypothesis_id": "H-XXX",
+  "stage": "IDEA | HYPOTHESIS | NOVELTY | FEASIBILITY | PROTOCOL | PILOT | EXPERIMENT | DEBUG | ABLATION | REVIEW | ANALYSIS | DECISION",
+  "status": "PLANNED | RUNNING | INTERRUPTED | BLOCKED | DONE | FAILED | PARTIAL | INVALIDATED",
+  "parent_experiment_id": null,
+  "gates": {
+    "novelty": {"verdict": "PASS | WARNING | FAIL | PENDING", "artifact": "NOVELTY.md", "accepted_warning": false},
+    "feasibility": {"verdict": "PASS | WARNING | FAIL | PENDING", "artifact": "FEASIBILITY.md", "accepted_warning": false},
+    "protocol": {"verdict": "PASS | WARNING | FAIL | PENDING", "artifact": "PROTOCOL.md", "accepted_warning": false},
+    "pilot": {"verdict": "PASS | WARNING | FAIL | PENDING", "artifact": "PILOT.md", "accepted_warning": false},
+    "review": {"verdict": "PASS | WARNING | FAIL | PENDING", "artifact": "REVIEW.md", "accepted_warning": false}
+  },
+  "artifacts": {
+    "summary": "results/summary.json",
+    "analysis": "analysis.md",
+    "decision": "DECISION.md",
+    "debug": "DEBUG.md",
+    "ablation": "ABLATION_PLAN.md"
+  },
+  "warnings": []
+}
+```
+
+Keep every artifact path relative to the experiment directory. Treat an artifact as valid only when it exists, parses when structured, is referenced by the manifest, and has no failed or unaccepted upstream gate. When a material protocol or implementation change makes downstream evidence stale, set the experiment to `INVALIDATED` or reset the affected gates to `PENDING` before continuing.
+
+## `results/summary.json` Version 2
+
+Use the following minimum structure for new experiments:
+
+```json
+{
+  "schema_version": 2,
   "experiment_id": "exp-YYYYMMDD-short-name",
   "hypothesis_id": "H-XXX",
   "status": "DONE | FAILED | PARTIAL",
+  "protocol": "PROTOCOL.md",
+  "primary_metric": {"name": "metric_name", "direction": "minimize | maximize"},
   "config_base": "base config, command, or protocol name",
   "config_overrides": {},
-  "seed": 0,
-  "metrics": {},
-  "baseline": {},
+  "runs": [
+    {
+      "run_id": "run_0",
+      "seed": 0,
+      "status": "DONE | FAILED | PARTIAL",
+      "config": {},
+      "metrics": {},
+      "artifacts": {},
+      "warnings": []
+    }
+  ],
+  "aggregate": {
+    "n_planned": 1,
+    "n_completed": 1,
+    "metrics": {}
+  },
+  "baseline": {
+    "experiment_id": null,
+    "source": "artifact, command, citation, or not-applicable reason",
+    "metrics": {}
+  },
   "delta_vs_baseline": {},
+  "provenance": {
+    "git_commit": null,
+    "data_version": null,
+    "environment": null
+  },
   "artifacts": {},
   "budget": {
     "max_runs": null,
@@ -96,7 +184,9 @@ Each completed or paper-relevant experiment should contain:
 }
 ```
 
-Use `null` only when the field is not applicable and explain the reason in `warnings`.
+Use `runs` for repeated executions, folds, groups, or other project-defined units; keep their domain-specific fields inside each run or its artifacts. Keep aggregation methods project-defined and record them in the protocol. Use `null` only when a field is not applicable or unavailable and explain the reason in `warnings`.
+
+Legacy summaries without `schema_version` remain valid in compatibility mode when they contain the previous top-level `seed` and `metrics` fields. Treat them as warnings so existing projects can migrate incrementally. In strict mode, require version 2.
 
 ## Compact Templates
 
@@ -145,7 +235,7 @@ Use `null` only when the field is not applicable and explain the reason in `warn
 - **Config overrides**: <key overrides>
 - **Baseline**: <baseline artifact or command>
 - **Budget**: <max runs, timeout, retry limit>
-- **Status**: PLANNED | RUNNING | DONE | FAILED
+- **Status**: PLANNED | RUNNING | INTERRUPTED | BLOCKED | DONE | FAILED | PARTIAL | INVALIDATED
 - **Owner**: <role or agent>
 ```
 
@@ -183,6 +273,7 @@ Use `null` only when the field is not applicable and explain the reason in `warn
 - [ ] Code path understood
 - [ ] Baseline or control identified
 - [ ] Result schema and artifact paths defined
+- [ ] Data and evaluation boundaries can be stated before execution
 - [ ] Sandbox and network policy acceptable
 
 ## Risks
@@ -196,6 +287,25 @@ Use `null` only when the field is not applicable and explain the reason in `warn
 | Novelty or prior-art risk | LOW/MED/HIGH | |
 | Safety or dependency risk | LOW/MED/HIGH | |
 ```
+
+### Protocol
+
+```markdown
+# Protocol: <experiment-id>
+
+- **Status**: DRAFT | LOCKED | INVALIDATED
+- **Research question**: <question being tested>
+- **Primary metric and direction**: <metric; minimize or maximize>
+- **Baseline or control**: <artifact, command, citation, or not-applicable reason>
+- **Data and evaluation boundaries**: <protected splits, inputs, evaluation rules>
+- **Run plan and budget**: <runs, repeats, timeout, retry limit>
+- **Stopping and selection rule**: <predefined rule>
+- **Allowed change surface**: <what may change; what must remain fixed>
+- **Success or failure rule**: <evidence threshold or decision rule>
+- **Warnings or accepted exceptions**: <none or recorded rationale>
+```
+
+Keep this artifact concise. Add domain-specific audit items only in the downstream project's playbook or experiment files.
 
 ### Pilot
 
@@ -217,6 +327,7 @@ Use `null` only when the field is not applicable and explain the reason in `warn
 - [ ] Shapes, schemas, or interfaces are correct
 - [ ] No NaN, Inf, empty output, or silent artifact failure
 - [ ] Expected artifacts are created
+- [ ] Locked protocol still applies
 - [ ] Change-specific sanity check passed
 ```
 
@@ -242,13 +353,58 @@ Use `null` only when the field is not applicable and explain the reason in `warn
 - <why a run was kept, discarded, retried, or stopped>
 ```
 
+### Debug
+
+```markdown
+# Debug Report: <experiment-id>
+
+- **Status**: FIXED | BLOCKED | INVALIDATED
+- **Failure class**: DATA | MODEL | TRAINING | EVALUATION | INFRASTRUCTURE | ARTIFACT
+- **Smallest reproduction**: <command or case>
+- **Root cause**: <evidence-backed explanation>
+- **Affected artifacts**: <paths or none>
+- **Retries used / limit**: <count / limit>
+- **Next action**: <rerun stage, invalidate, or block>
+```
+
+### Ablation Plan
+
+```markdown
+# Ablation Plan: <experiment-id>
+
+- **Reference condition**: <artifact or config>
+- **Shared protocol**: PROTOCOL.md
+- **Primary metric**: <metric>
+- **Budget**: <runs, timeout, retries>
+
+| Row | Single changed factor | Fixed factors | Expected evidence |
+|---|---|---|---|
+| A0 | reference | all | baseline |
+| A1 | <factor> | all others | <metric or artifact> |
+
+Declare an interaction study explicitly when a row changes more than one factor.
+```
+
+### Decision
+
+```markdown
+# Decision: <experiment-id>
+
+- **Action**: REPLICATE | ABLATE | REVISE | SCALE | DEBUG | STOP
+- **Evidence**: <reviewed analysis and artifact references>
+- **Rationale**: <why this action follows>
+- **Destination**: <stage or child experiment ID; none for STOP>
+- **Artifact validity**: <which existing artifacts remain valid or are invalidated>
+- **Owner**: <role, agent, or person>
+```
+
 ### Review
 
 ```markdown
 # Review Report: <target>
 
 - **Status**: PASS | WARNING | FAIL
-- **Scope**: code | experiment | analysis | paper draft
+- **Scope**: protocol | code | experiment | analysis | paper draft
 - **Reviewer**: <role or agent>
 
 ## Findings
@@ -289,9 +445,10 @@ Use `null` only when the field is not applicable and explain the reason in `warn
 |---|---|---|---|
 | | | | |
 
-## Next Steps
+## Decision Input
 
-1. <next experiment or decision>
+- Recommended action: REPLICATE | ABLATE | REVISE | SCALE | DEBUG | STOP
+- Evidence for recommendation: <artifact references>
 ```
 
 ### Paper Section
@@ -379,9 +536,10 @@ Before presenting paper text as final or paper-ready, verify:
 When using this workflow in a new project:
 
 1. Identify the project's baseline, control condition, or previous best result.
-2. Define the smallest valid pilot and the smallest result-bearing full run.
-3. Define domain metrics and acceptable sanity checks.
-4. Decide where ideas, hypotheses, experiment directories, analysis artifacts, and paper drafts live.
-5. Record environment assumptions and required commands in project files, not in this generic skill.
-6. Keep project-specific domain facts in `AGENTS.md`, a local playbook, or a project reference file.
-7. Do not migrate unsupported claims from old projects; only migrate the process.
+2. Lock the smallest shared protocol that makes comparisons valid.
+3. Define the smallest valid pilot and the smallest result-bearing full run.
+4. Define domain metrics and acceptable sanity checks.
+5. Decide where ideas, hypotheses, experiment directories, analysis artifacts, and paper drafts live.
+6. Record environment assumptions and required commands in project files, not in this generic skill.
+7. Keep project-specific domain facts in `AGENTS.md`, a local playbook, or a project reference file.
+8. Do not migrate unsupported claims from old projects; only migrate the process.

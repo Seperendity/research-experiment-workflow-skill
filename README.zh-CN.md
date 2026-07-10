@@ -6,13 +6,13 @@
 
 一个用于研究、机器学习和论文实验的 Codex skill，核心目标是把实验过程沉淀成可审查的 artifact 链条。
 
-这个 skill 会让 Codex 不再急着写代码和下结论，而是先评分想法、提出可证伪假设、检查新颖性风险、做可行性判断和 pilot，再进入正式实验、review、analysis，最后才写论文或报告文本。
+这个 skill 会让 Codex 不再急着写代码和下结论，而是先评分想法、提出可证伪假设，在正式运行前锁定评价协议，并让经过 review 的 analysis 产生明确的下一步决策。
 
 ## 它解决什么问题
 
-- **稳定的研究流程**：覆盖 idea scoring、hypothesis、novelty check、feasibility、pilot、experiment run、review、analysis、writing。
-- **可恢复的实验记录**：提供 `ideas.json`、`NOVELTY.md`、`FEASIBILITY.md`、`PILOT.md`、`run_notes.md`、`results/summary.json`、`REVIEW.md`、`analysis.md` 等 artifact 模板。
-- **面向论文的防护栏**：检查 baseline、公平比较、新颖性风险、数据泄漏、指标误用、事后筛选、审稿 rubric 和写作完整性。
+- **稳定的研究流程**：覆盖 idea scoring、hypothesis、novelty check、feasibility、protocol lock、pilot、experiment run、review、analysis、decision 和 writing。
+- **可恢复的实验记录**：使用 `experiment.json` manifest，并提供 protocol、run、review、analysis、debug、ablation 和 decision 模板。
+- **研究防护栏**：锁定评价边界，并检查 baseline、新颖性风险、数据泄漏、指标误用、事后筛选和 artifact 失效条件。
 - **完整论文写作指导**：覆盖 Abstract、Introduction、Related Work、Method、Experiments、Conclusion、段落流畅性、图表表达、claim-evidence map 和投稿前对抗式自审。
 - **跨项目复用**：具体命令、数据路径和指标留在每个项目里；这个 skill 只负责稳定流程和阶段门。
 
@@ -27,7 +27,7 @@ cp -R research-experiment-workflow-skill/research-experiment-workflow "${CODEX_H
 安装后，在任意 Codex 会话中调用：
 
 ```text
-使用 $research-experiment-workflow，帮我把这个研究想法推进成假设、novelty check、feasibility 和 pilot 计划。
+使用 $research-experiment-workflow，把这个研究想法推进成假设、novelty check、feasibility、锁定 protocol 和 pilot 计划。
 ```
 
 ## 流程
@@ -37,10 +37,12 @@ idea scoring
   -> hypothesis
   -> novelty check
   -> feasibility
+  -> protocol lock
   -> pilot
   -> experiment run
   -> review
   -> analysis
+  -> decision
   -> writing
 ```
 
@@ -53,6 +55,8 @@ research-experiment-workflow/
   SKILL.md
   agents/
     openai.yaml
+  scripts/
+    validate_experiment.py
   references/
     artifact-contract.md
     roles.md
@@ -62,9 +66,17 @@ research-experiment-workflow/
 
 - `SKILL.md` 定义阶段路由、阶段门、角色纪律和操作原则。
 - `references/artifact-contract.md` 定义 artifact schema、紧凑模板、review rubric 和写作检查。
+- `scripts/validate_experiment.py` 只读验证 manifest、gate 和结果摘要，不修改实验目录。
 - `references/paper-writing.md` 负责论文起草、章节改写、段落流畅性检查、图表表达、claim-evidence map 和论文自审的路由。
 - `references/paper-writing-*.md` 包含来自 `Master-cai/Research-Paper-Writing-Skills` 的章节写作指南和扁平化 example bank。
 - `agents/openai.yaml` 提供 Codex UI 元信息和默认 prompt。
+
+兼容模式用于旧实验，新实验可使用 strict 模式：
+
+```bash
+python research-experiment-workflow/scripts/validate_experiment.py path/to/experiment
+python research-experiment-workflow/scripts/validate_experiment.py path/to/experiment --strict
+```
 
 ## 示例：一个新项目如何开始实验
 
@@ -91,6 +103,7 @@ research/
     tracker.md
   experiments/
     exp-20260701-hybrid-retrieval/
+      experiment.json
       README.md
       NOVELTY.md
       FEASIBILITY.md
@@ -109,10 +122,18 @@ research/
 - 指标：recall@5、recall@10、MRR、latency_ms
 ```
 
+执行前，只锁定看到结果后不能漂移的比较规则：
+
+```text
+使用 $research-experiment-workflow，为这个实验锁定最小 protocol。
+在 PROTOCOL.md 中记录主指标及方向、baseline、评价边界、运行预算、
+停止与选择规则、允许修改范围和成功判定。
+```
+
 接着先跑 pilot：
 
 ```text
-使用 $research-experiment-workflow，基于当前 FEASIBILITY.md 设计并执行最小 pilot。
+使用 $research-experiment-workflow，在已锁定的 PROTOCOL.md 下设计并执行最小 pilot。
 
 要求：
 - 只用 20 条 eval queries
@@ -130,11 +151,11 @@ research/
 - 使用完整 eval_queries.jsonl
 - 固定 seed
 - 比较 pure_embedding、hybrid_retrieval、hybrid_with_rerank 三组
-- 保存 results/summary.json、run_notes.md
+- 保存 version 2 的 results/summary.json 和 run_notes.md
 - 不要写论文结论，先进入 review
 ```
 
-最后把 review、analysis、writing 分开推进：
+最后把 review、analysis、decision、writing 分开推进：
 
 ```text
 使用 $research-experiment-workflow，作为 Reviewer 检查这个实验结果是否可信。
@@ -144,6 +165,11 @@ research/
 ```text
 使用 $research-experiment-workflow，基于 results/summary.json 和 run_notes.md 写 analysis.md。
 只写支持和不支持的 claim，不要写论文段落。
+```
+
+```text
+使用 $research-experiment-workflow，基于已 review 的 analysis 记录 DECISION.md。
+只选择一个动作：REPLICATE、ABLATE、REVISE、SCALE、DEBUG 或 STOP。
 ```
 
 ```text
@@ -162,9 +188,11 @@ research/
 ## 设计原则
 
 - **Baseline first**：没有复现或明确替代 baseline，不声称提升。
+- **Protocol first**：在正式运行前锁定评价边界和决策规则。
 - **Pilot first**：重大改动先通过最小 pilot，再扩大实验。
 - **Novelty before paper claims**：写论文贡献前先检查相近工作。
 - **Evidence over memory**：把证据写入 artifact，不依赖聊天上下文。
+- **Decision after analysis**：明确记录复现、消融、修订、扩展、调试或停止。
 - **Writing after review**：论文文本消费通过 review 的 analysis，而不是直接消费原始日志。
 
 ## 设计来源

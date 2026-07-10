@@ -6,13 +6,13 @@
 
 An artifact-gated Codex skill for research, machine learning, and paper-oriented experiments.
 
-This skill helps Codex act less like an eager code generator and more like a disciplined research operator: ideas are scored, hypotheses are made falsifiable, novelty risk is checked, pilots run before full experiments, reviews happen before claims, and writing is grounded in saved artifacts.
+This skill helps Codex act less like an eager code generator and more like a disciplined research operator: ideas are scored, hypotheses are made falsifiable, evaluation protocols are locked before result-bearing runs, and reviewed analysis ends in an explicit next decision.
 
 ## What It Provides
 
-- **A staged research workflow**: idea scoring, hypothesis, novelty check, feasibility, pilot, experiment run, review, analysis, and writing.
-- **Durable experiment artifacts**: templates for `ideas.json`, `NOVELTY.md`, `FEASIBILITY.md`, `PILOT.md`, `run_notes.md`, `results/summary.json`, `REVIEW.md`, and `analysis.md`.
-- **Paper-aware guardrails**: baseline checks, novelty risk, leakage checks, metric misuse, post-hoc selection, review rubric, and writing integrity checks.
+- **A staged research workflow**: idea scoring, hypothesis, novelty check, feasibility, protocol lock, pilot, experiment run, review, analysis, decision, and writing.
+- **Durable experiment artifacts**: a resumable `experiment.json` manifest plus protocol, run, review, analysis, debug, ablation, and decision templates.
+- **Research guardrails**: locked evaluation boundaries, baseline checks, novelty risk, leakage checks, metric misuse, post-hoc selection, and explicit invalidation rules.
 - **Complete paper-writing guidance**: reviewer-facing guidance for Abstract, Introduction, Related Work, Method, Experiments, Conclusion, paragraph flow, figure/table presentation, claim-evidence maps, and adversarial self-review.
 - **Cross-project reuse**: project-specific commands and metrics stay in each repo; the reusable skill keeps the process consistent.
 
@@ -27,7 +27,7 @@ cp -R research-experiment-workflow-skill/research-experiment-workflow "${CODEX_H
 Then invoke it from any Codex session:
 
 ```text
-Use $research-experiment-workflow to turn this research idea into a hypothesis, novelty check, feasibility report, and pilot plan.
+Use $research-experiment-workflow to turn this idea into a hypothesis, novelty check, feasibility report, locked protocol, and pilot plan.
 ```
 
 ## Workflow
@@ -37,10 +37,12 @@ idea scoring
   -> hypothesis
   -> novelty check
   -> feasibility
+  -> protocol lock
   -> pilot
   -> experiment run
   -> review
   -> analysis
+  -> decision
   -> writing
 ```
 
@@ -53,6 +55,8 @@ research-experiment-workflow/
   SKILL.md
   agents/
     openai.yaml
+  scripts/
+    validate_experiment.py
   references/
     artifact-contract.md
     roles.md
@@ -62,9 +66,17 @@ research-experiment-workflow/
 
 - `SKILL.md` defines the stage router, gates, role discipline, and operating principles.
 - `references/artifact-contract.md` defines the artifact schema, compact templates, review rubric, and writing checks.
+- `scripts/validate_experiment.py` validates manifests, gates, and result summaries without modifying the experiment.
 - `references/paper-writing.md` routes paper drafting, section revision, paragraph-flow checks, figure/table presentation, claim-evidence mapping, and paper self-review.
 - `references/paper-writing-*.md` contains section-specific writing guides and flattened example banks adapted from `Master-cai/Research-Paper-Writing-Skills`.
 - `agents/openai.yaml` provides Codex UI metadata and a default prompt.
+
+Validate an experiment in compatibility mode, or use strict mode for new work:
+
+```bash
+python research-experiment-workflow/scripts/validate_experiment.py path/to/experiment
+python research-experiment-workflow/scripts/validate_experiment.py path/to/experiment --strict
+```
 
 ## Example: Starting A New Experiment Project
 
@@ -91,6 +103,7 @@ research/
     tracker.md
   experiments/
     exp-20260701-hybrid-retrieval/
+      experiment.json
       README.md
       NOVELTY.md
       FEASIBILITY.md
@@ -109,10 +122,18 @@ Available commands:
 - Metrics: recall@5, recall@10, MRR, latency_ms
 ```
 
+Before execution, lock only the comparison rules that must not drift after results are observed:
+
+```text
+Use $research-experiment-workflow to lock the minimal protocol for this experiment.
+Record the primary metric and direction, baseline, evaluation boundaries, run budget,
+stopping and selection rule, allowed changes, and success rule in PROTOCOL.md.
+```
+
 Then run a pilot before scaling:
 
 ```text
-Use $research-experiment-workflow to design and execute the smallest pilot from the current FEASIBILITY.md.
+Use $research-experiment-workflow to design and execute the smallest pilot under the locked PROTOCOL.md.
 
 Requirements:
 - Use only 20 eval queries
@@ -130,11 +151,11 @@ Requirements:
 - Use the complete eval_queries.jsonl
 - Fix the seed
 - Compare pure_embedding, hybrid_retrieval, and hybrid_with_rerank
-- Save results/summary.json and run_notes.md
+- Save a version 2 results/summary.json and run_notes.md
 - Do not write paper conclusions yet. Move to review first.
 ```
 
-Finally, keep review, analysis, and writing separate:
+Finally, keep review, analysis, decision, and writing separate:
 
 ```text
 Use $research-experiment-workflow as Reviewer to check whether this experiment is trustworthy.
@@ -144,6 +165,11 @@ Focus on baseline fairness, data leakage, metric validity, cherry-picking, and a
 ```text
 Use $research-experiment-workflow to write analysis.md from results/summary.json and run_notes.md.
 Only state supported and unsupported claims. Do not draft paper prose yet.
+```
+
+```text
+Use $research-experiment-workflow to record DECISION.md from the reviewed analysis.
+Choose exactly one action: REPLICATE, ABLATE, REVISE, SCALE, DEBUG, or STOP.
 ```
 
 ```text
@@ -162,9 +188,11 @@ Do not invent numbers, baselines, citations, figures, or conclusions.
 ## Design Principles
 
 - **Baseline first**: do not claim improvement until a baseline is reproduced or explicitly replaced.
+- **Protocol first**: lock evaluation boundaries and decision rules before result-bearing execution.
 - **Pilot first**: do not scale a major change until a minimal pilot passes.
 - **Novelty before paper claims**: check close prior work before presenting a contribution.
 - **Evidence over memory**: save artifacts that later stages can inspect.
+- **Decision after analysis**: record whether to replicate, ablate, revise, scale, debug, or stop.
 - **Writing after review**: paper prose should consume reviewed analysis, not raw logs.
 
 ## Inspiration
