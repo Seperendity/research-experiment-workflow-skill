@@ -49,8 +49,9 @@ class ValidateExperimentTests(unittest.TestCase):
             )
 
         self.manifest = {
-            "schema_version": 2,
+            "schema_version": 3,
             "experiment_id": "exp-20260710-example",
+            "profile": "PAPER",
             "hypothesis_id": "H-001",
             "stage": "DECISION",
             "status": "DONE",
@@ -59,7 +60,8 @@ class ValidateExperimentTests(unittest.TestCase):
                 name: {
                     "verdict": "PASS",
                     "artifact": artifact,
-                    "accepted_warning": False,
+                    "rationale": None,
+                    "acceptance": None,
                 }
                 for name, artifact in {
                     "novelty": "NOVELTY.md",
@@ -136,10 +138,11 @@ class ValidateExperimentTests(unittest.TestCase):
         self._write_current()
         return VALIDATOR.validate_experiment(self.experiment_dir)
 
-    def test_complete_v2_experiment_passes_strict_validation(self) -> None:
+    def test_complete_v3_experiment_passes_strict_validation(self) -> None:
         result = self._validate()
         self.assertEqual([], result.errors)
         self.assertEqual([], result.warnings)
+        self.assertEqual([], result.notices)
         self.assertEqual(0, result.exit_code(strict=True))
 
     def test_legacy_summary_warns_but_passes_compatibility_mode(self) -> None:
@@ -186,7 +189,8 @@ class ValidateExperimentTests(unittest.TestCase):
         self.manifest["gates"]["novelty"] = {
             "verdict": "PENDING",
             "artifact": str(self.experiment_dir / "NOVELTY.md"),
-            "accepted_warning": False,
+            "rationale": "Novelty review has not started.",
+            "acceptance": None,
         }
 
         result = self._validate()
@@ -240,18 +244,181 @@ class ValidateExperimentTests(unittest.TestCase):
             any("artifact 'decision' does not exist" in item for item in result.errors)
         )
 
-    def test_gate_warning_requires_acceptance(self) -> None:
-        self.manifest["gates"]["protocol"]["verdict"] = "WARNING"
-        result = self._validate()
-        self.assertTrue(
-            any("gate 'protocol' warning has not been accepted" in item for item in result.errors)
+    def test_warning_must_be_accepted_before_required_progress(self) -> None:
+        self.manifest["stage"] = "PROTOCOL"
+        self.manifest["gates"]["protocol"].update(
+            {
+                "verdict": "WARNING",
+                "rationale": "The proxy metric is imperfect but documented.",
+                "acceptance": None,
+            }
         )
 
-        self.manifest["gates"]["protocol"]["accepted_warning"] = True
         result = self._validate()
+
         self.assertEqual([], result.errors)
-        self.assertIn("gate 'protocol' contains an accepted warning", result.warnings)
+        self.assertTrue(
+            any("warning is awaiting acceptance" in item for item in result.warnings)
+        )
         self.assertEqual(1, result.exit_code(strict=True))
+
+        self.manifest["stage"] = "PILOT"
+        result = self._validate()
+        self.assertTrue(
+            any(
+                "requires gate 'protocol' to pass or have an accepted warning" in item
+                for item in result.errors
+            )
+        )
+
+    def test_v3_warning_requires_gate_rationale(self) -> None:
+        self.manifest["stage"] = "PROTOCOL"
+        self.manifest["gates"]["protocol"]["verdict"] = "WARNING"
+
+        result = self._validate()
+
+        self.assertTrue(
+            any("WARNING verdict requires a rationale" in item for item in result.errors)
+        )
+
+    def test_explicitly_accepted_warning_is_a_notice_and_passes_strict(self) -> None:
+        self.manifest["stage"] = "PILOT"
+        self.manifest["gates"]["protocol"].update(
+            {
+                "verdict": "WARNING",
+                "rationale": "The proxy metric is imperfect but documented.",
+                "acceptance": {
+                    "accepted_by": "project-owner",
+                    "accepted_at": "2026-07-14T10:00:00Z",
+                    "rationale": "Acceptable for this bounded pilot.",
+                },
+            }
+        )
+
+        result = self._validate()
+
+        self.assertEqual([], result.errors)
+        self.assertEqual([], result.warnings)
+        self.assertTrue(
+            any("explicitly accepted warning" in item for item in result.notices)
+        )
+        self.assertEqual(0, result.exit_code(strict=True))
+
+    def test_warning_acceptance_timestamp_must_include_timezone(self) -> None:
+        self.manifest["stage"] = "PROTOCOL"
+        self.manifest["gates"]["protocol"].update(
+            {
+                "verdict": "WARNING",
+                "rationale": "The proxy metric is imperfect but documented.",
+                "acceptance": {
+                    "accepted_by": "project-owner",
+                    "accepted_at": "2026-07-14T10:00:00",
+                    "rationale": "Acceptable for this bounded pilot.",
+                },
+            }
+        )
+
+        result = self._validate()
+
+        self.assertTrue(
+            any("timezone-aware ISO-8601" in item for item in result.errors)
+        )
+
+    def test_v2_manifest_is_compatibility_only(self) -> None:
+        self.manifest["schema_version"] = 2
+        self.manifest.pop("profile")
+        self.manifest["gates"] = {
+            name: {
+                "verdict": gate["verdict"],
+                "artifact": gate["artifact"],
+                "accepted_warning": False,
+            }
+            for name, gate in self.manifest["gates"].items()
+        }
+
+        result = self._validate()
+
+        self.assertEqual([], result.errors)
+        self.assertTrue(
+            any("compatibility mode" in item for item in result.warnings)
+        )
+        self.assertEqual(0, result.exit_code(strict=False))
+        self.assertEqual(1, result.exit_code(strict=True))
+
+    def test_lite_profile_allows_nonessential_gates_and_hypothesis_to_be_na(self) -> None:
+        self.manifest["profile"] = "LITE"
+        self.manifest["hypothesis_id"] = None
+        self.summary["hypothesis_id"] = None
+        for gate_name in ("novelty", "feasibility", "review"):
+            self.manifest["gates"][gate_name] = {
+                "verdict": "NOT_APPLICABLE",
+                "artifact": None,
+                "rationale": "Outside the bounded engineering claim.",
+                "acceptance": None,
+            }
+
+        result = self._validate()
+
+        self.assertEqual([], result.errors)
+        self.assertEqual([], result.warnings)
+
+    def test_standard_profile_allows_novelty_gate_to_be_na(self) -> None:
+        self.manifest["profile"] = "STANDARD"
+        self.manifest["gates"]["novelty"] = {
+            "verdict": "NOT_APPLICABLE",
+            "artifact": None,
+            "rationale": "No novelty claim is planned.",
+            "acceptance": None,
+        }
+
+        result = self._validate()
+
+        self.assertEqual([], result.errors)
+        self.assertEqual([], result.warnings)
+
+    def test_paper_profile_rejects_required_gate_as_na(self) -> None:
+        self.manifest["gates"]["novelty"] = {
+            "verdict": "NOT_APPLICABLE",
+            "artifact": None,
+            "rationale": "Attempted omission.",
+            "acceptance": None,
+        }
+
+        result = self._validate()
+
+        self.assertTrue(
+            any(
+                "cannot be NOT_APPLICABLE under profile PAPER" in item
+                for item in result.errors
+            )
+        )
+
+    def test_legacy_audit_can_validate_without_result_summary(self) -> None:
+        self.manifest["profile"] = "LEGACY_AUDIT"
+        self.manifest["hypothesis_id"] = None
+        self.manifest["stage"] = "ANALYSIS"
+        self.manifest["artifacts"].pop("summary")
+        for gate_name in self.manifest["gates"]:
+            self.manifest["gates"][gate_name] = {
+                "verdict": "NOT_APPLICABLE",
+                "artifact": None,
+                "rationale": "The historical record did not capture this gate.",
+                "acceptance": None,
+            }
+        self._write_current()
+        (self.experiment_dir / "results" / "summary.json").unlink()
+
+        result = VALIDATOR.validate_experiment(self.experiment_dir)
+
+        self.assertEqual([], result.errors)
+        self.assertEqual([], result.warnings)
+
+    def test_target_and_none_metric_directions_are_supported(self) -> None:
+        for direction in ("target", "none"):
+            with self.subTest(direction=direction):
+                self.summary["primary_metric"]["direction"] = direction
+                result = self._validate()
+                self.assertEqual([], result.errors)
 
 
 if __name__ == "__main__":

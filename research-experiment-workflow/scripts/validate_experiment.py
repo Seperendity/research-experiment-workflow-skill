@@ -6,10 +6,15 @@ from __future__ import annotations
 import argparse
 import json
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-SCHEMA_VERSION = 2
+MANIFEST_SCHEMA_VERSION = 3
+LEGACY_MANIFEST_SCHEMA_VERSION = 2
+SUMMARY_SCHEMA_VERSION = 2
+VALID_PROFILES = {"LITE", "STANDARD", "PAPER", "LEGACY_AUDIT"}
+
 VALID_STAGES = {
     "IDEA",
     "HYPOTHESIS",
@@ -34,10 +39,17 @@ VALID_STATUSES = {
     "PARTIAL",
     "INVALIDATED",
 }
-VALID_GATE_VERDICTS = {"PASS", "WARNING", "FAIL", "PENDING"}
+VALID_GATE_VERDICTS_V2 = {"PASS", "WARNING", "FAIL", "PENDING"}
+VALID_GATE_VERDICTS_V3 = VALID_GATE_VERDICTS_V2 | {"NOT_APPLICABLE"}
 REQUIRED_GATES = {"novelty", "feasibility", "protocol", "pilot", "review"}
 RESULT_STATUSES = {"DONE", "FAILED", "PARTIAL"}
-PREREQUISITE_GATES = {
+PROFILE_REQUIRED_GATES = {
+    "LITE": {"protocol", "pilot"},
+    "STANDARD": {"feasibility", "protocol", "pilot", "review"},
+    "PAPER": REQUIRED_GATES,
+    "LEGACY_AUDIT": set(),
+}
+V2_PREREQUISITE_GATES = {
     "FEASIBILITY": ("novelty",),
     "PROTOCOL": ("novelty", "feasibility"),
     "PILOT": ("novelty", "feasibility", "protocol"),
@@ -49,16 +61,42 @@ PREREQUISITE_GATES = {
 }
 
 
+PROFILE_PREREQUISITE_GATES = {
+    "LITE": {
+        "PILOT": ("protocol",),
+        "EXPERIMENT": ("protocol", "pilot"),
+        "ABLATION": ("protocol", "pilot"),
+        "ANALYSIS": ("protocol", "pilot"),
+        "DECISION": ("protocol", "pilot"),
+    },
+    "STANDARD": {
+        "PROTOCOL": ("feasibility",),
+        "PILOT": ("feasibility", "protocol"),
+        "EXPERIMENT": ("feasibility", "protocol", "pilot"),
+        "ABLATION": ("feasibility", "protocol", "pilot"),
+        "REVIEW": ("feasibility", "protocol", "pilot"),
+        "ANALYSIS": ("feasibility", "protocol", "pilot", "review"),
+        "DECISION": ("feasibility", "protocol", "pilot", "review"),
+    },
+    "PAPER": V2_PREREQUISITE_GATES,
+    "LEGACY_AUDIT": {},
+}
+
+
 @dataclass
 class ValidationResult:
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    notices: list[str] = field(default_factory=list)
 
     def error(self, message: str) -> None:
         self.errors.append(message)
 
     def warn(self, message: str) -> None:
         self.warnings.append(message)
+
+    def notice(self, message: str) -> None:
+        self.notices.append(message)
 
     def exit_code(self, strict: bool = False) -> int:
         return 1 if self.errors or (strict and self.warnings) else 0
@@ -125,13 +163,175 @@ def _artifact_path(
     return candidate
 
 
-def _gate_allows_progress(gate: Any) -> bool:
+def _is_nonempty_string(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def _is_iso8601_timestamp(value: Any) -> bool:
+    if not _is_nonempty_string(value) or "T" not in value:
+        return False
+    normalized = value[:-1] + "+00:00" if value.endswith("Z") else value
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError:
+        return False
+    return parsed.tzinfo is not None
+
+
+def _acceptance_is_complete(value: Any) -> bool:
+    return (
+        isinstance(value, dict)
+        and _is_nonempty_string(value.get("accepted_by"))
+        and _is_iso8601_timestamp(value.get("accepted_at"))
+        and _is_nonempty_string(value.get("rationale"))
+    )
+
+
+def _validate_acceptance(value: Any, result: ValidationResult, label: str) -> bool:
+    if not isinstance(value, dict):
+        result.error(f"{label} must be an object")
+        return False
+    _require_keys(
+        value,
+        {"accepted_by", "accepted_at", "rationale"},
+        result,
+        label,
+    )
+    valid = True
+    for key in ("accepted_by", "rationale"):
+        if not _is_nonempty_string(value.get(key)):
+            result.error(f"{label}.{key} must be a non-empty string")
+            valid = False
+    if not _is_iso8601_timestamp(value.get("accepted_at")):
+        result.error(f"{label}.accepted_at must be a timezone-aware ISO-8601 timestamp")
+        valid = False
+    return valid
+
+
+def _gate_allows_progress(gate: Any, schema_version: int) -> bool:
     if not isinstance(gate, dict):
         return False
     verdict = gate.get("verdict")
-    return verdict == "PASS" or (
-        verdict == "WARNING" and gate.get("accepted_warning") is True
+    if verdict == "PASS":
+        return True
+    if verdict != "WARNING":
+        return False
+    if schema_version == MANIFEST_SCHEMA_VERSION:
+        return _acceptance_is_complete(gate.get("acceptance"))
+    return gate.get("accepted_warning") is True
+
+
+def _validate_v2_gate(
+    root: Path,
+    gate_name: str,
+    gate: Any,
+    status: Any,
+    result: ValidationResult,
+) -> None:
+    label = f"gate '{gate_name}'"
+    if not isinstance(gate, dict):
+        result.error(f"{label} must be an object")
+        return
+    _require_keys(
+        gate,
+        {"verdict", "artifact", "accepted_warning"},
+        result,
+        label,
     )
+    verdict = gate.get("verdict")
+    if verdict not in VALID_GATE_VERDICTS_V2:
+        result.error(f"{label} has invalid verdict: {verdict!r}")
+        return
+    if not isinstance(gate.get("accepted_warning"), bool):
+        result.error(f"{label} accepted_warning must be boolean")
+    _artifact_path(
+        root,
+        gate.get("artifact"),
+        result,
+        f"{label} artifact",
+        require_exists=verdict != "PENDING",
+    )
+    if verdict == "WARNING":
+        if gate.get("accepted_warning") is True:
+            result.notice(f"{label} contains an accepted compatibility warning")
+        else:
+            result.warn(f"{label} warning is awaiting acceptance")
+    if verdict == "FAIL":
+        if status not in {"BLOCKED", "FAILED", "INVALIDATED"}:
+            result.error(f"{label} failed but experiment status is {status!r}")
+        else:
+            result.warn(f"{label} records a failed gate")
+
+
+def _validate_v3_gate(
+    root: Path,
+    gate_name: str,
+    gate: Any,
+    profile: Any,
+    status: Any,
+    result: ValidationResult,
+) -> None:
+    label = f"gate '{gate_name}'"
+    if not isinstance(gate, dict):
+        result.error(f"{label} must be an object")
+        return
+    _require_keys(
+        gate,
+        {"verdict", "artifact", "rationale", "acceptance"},
+        result,
+        label,
+    )
+    verdict = gate.get("verdict")
+    if verdict not in VALID_GATE_VERDICTS_V3:
+        result.error(f"{label} has invalid verdict: {verdict!r}")
+        return
+
+    rationale = gate.get("rationale")
+    if verdict in {"WARNING", "NOT_APPLICABLE"}:
+        if not _is_nonempty_string(rationale):
+            result.error(f"{label} {verdict} verdict requires a rationale")
+    elif rationale is not None and not _is_nonempty_string(rationale):
+        result.error(f"{label} rationale must be null or a non-empty string")
+
+    acceptance = gate.get("acceptance")
+    if verdict == "WARNING":
+        if acceptance is None:
+            result.warn(f"{label} warning is awaiting acceptance")
+        elif _validate_acceptance(acceptance, result, f"{label} acceptance"):
+            result.notice(f"{label} contains an explicitly accepted warning")
+    elif acceptance is not None:
+        result.error(f"{label} acceptance is only valid for a WARNING verdict")
+
+    if verdict == "NOT_APPLICABLE":
+        if gate.get("artifact") is not None:
+            result.error(f"{label} artifact must be null when verdict is NOT_APPLICABLE")
+        if profile in PROFILE_REQUIRED_GATES and gate_name in PROFILE_REQUIRED_GATES[profile]:
+            result.error(
+                f"{label} cannot be NOT_APPLICABLE under profile {profile}"
+            )
+    elif verdict == "PENDING":
+        if gate.get("artifact") is not None:
+            _artifact_path(
+                root,
+                gate.get("artifact"),
+                result,
+                f"{label} artifact",
+                require_exists=False,
+            )
+    else:
+        _artifact_path(
+            root,
+            gate.get("artifact"),
+            result,
+            f"{label} artifact",
+            require_exists=True,
+        )
+
+    if verdict == "FAIL":
+        if status not in {"BLOCKED", "FAILED", "INVALIDATED"}:
+            result.error(f"{label} failed but experiment status is {status!r}")
+        else:
+            result.warn(f"{label} records a failed gate")
 
 
 def _validate_manifest(
@@ -156,8 +356,25 @@ def _validate_manifest(
         "experiment.json",
     )
 
-    if manifest.get("schema_version") != SCHEMA_VERSION:
-        result.error(f"experiment.json schema_version must be {SCHEMA_VERSION}")
+    schema_version = manifest.get("schema_version")
+    if schema_version not in {
+        LEGACY_MANIFEST_SCHEMA_VERSION,
+        MANIFEST_SCHEMA_VERSION,
+    }:
+        result.error(
+            "experiment.json schema_version must be "
+            f"{LEGACY_MANIFEST_SCHEMA_VERSION} or {MANIFEST_SCHEMA_VERSION}"
+        )
+        return
+    if schema_version == LEGACY_MANIFEST_SCHEMA_VERSION:
+        result.warn("experiment.json schema version 2 is supported only in compatibility mode")
+        profile = "PAPER"
+    else:
+        if "profile" not in manifest:
+            result.error("experiment.json is missing required field 'profile'")
+        profile = manifest.get("profile")
+        if profile not in VALID_PROFILES:
+            result.error(f"experiment.json profile is invalid: {profile!r}")
 
     experiment_id = manifest.get("experiment_id")
     if not isinstance(experiment_id, str) or not experiment_id:
@@ -172,8 +389,17 @@ def _validate_manifest(
         )
 
     hypothesis_id = manifest.get("hypothesis_id")
-    if not isinstance(hypothesis_id, str) or not hypothesis_id.strip():
-        result.error("experiment.json hypothesis_id must be a non-empty string")
+    hypothesis_optional = (
+        schema_version == MANIFEST_SCHEMA_VERSION
+        and profile in {"LITE", "LEGACY_AUDIT"}
+    )
+    if hypothesis_id is None and hypothesis_optional:
+        pass
+    elif not _is_nonempty_string(hypothesis_id):
+        result.error(
+            "experiment.json hypothesis_id must be a non-empty string; "
+            "only LITE and LEGACY_AUDIT may use null"
+        )
 
     stage = manifest.get("stage")
     if stage not in VALID_STAGES:
@@ -195,55 +421,34 @@ def _validate_manifest(
             result.error(f"experiment.json gates is missing '{missing}'")
 
     for gate_name, gate in gates.items():
-        label = f"gate '{gate_name}'"
-        if not isinstance(gate, dict):
-            result.error(f"{label} must be an object")
-            continue
-        _require_keys(
-            gate,
-            {"verdict", "artifact", "accepted_warning"},
-            result,
-            label,
-        )
-        verdict = gate.get("verdict")
-        if verdict not in VALID_GATE_VERDICTS:
-            result.error(f"{label} has invalid verdict: {verdict!r}")
-            continue
-        if not isinstance(gate.get("accepted_warning"), bool):
-            result.error(f"{label} accepted_warning must be boolean")
-        _artifact_path(
-            root,
-            gate.get("artifact"),
-            result,
-            f"{label} artifact",
-            require_exists=verdict != "PENDING",
-        )
-        if verdict == "WARNING":
-            if gate.get("accepted_warning") is not True:
-                result.error(f"{label} warning has not been accepted")
-            else:
-                result.warn(f"{label} contains an accepted warning")
-        if verdict == "FAIL":
-            if status not in {"BLOCKED", "FAILED", "INVALIDATED"}:
-                result.error(f"{label} failed but experiment status is {status!r}")
-            else:
-                result.warn(f"{label} records a failed gate")
+        if schema_version == LEGACY_MANIFEST_SCHEMA_VERSION:
+            _validate_v2_gate(root, gate_name, gate, status, result)
+        else:
+            _validate_v3_gate(root, gate_name, gate, profile, status, result)
 
-    if stage in PREREQUISITE_GATES:
-        for gate_name in PREREQUISITE_GATES[stage]:
-            if not _gate_allows_progress(gates.get(gate_name)):
-                result.error(
-                    f"stage {stage} requires gate '{gate_name}' to pass "
-                    "or have an accepted warning"
-                )
+    if schema_version == LEGACY_MANIFEST_SCHEMA_VERSION:
+        prerequisite_gates = V2_PREREQUISITE_GATES
+    else:
+        prerequisite_gates = PROFILE_PREREQUISITE_GATES.get(profile, {})
+
+    for gate_name in prerequisite_gates.get(stage, ()):
+        if not _gate_allows_progress(gates.get(gate_name), schema_version):
+            result.error(
+                f"stage {stage} under profile {profile} requires gate "
+                f"'{gate_name}' to pass or have an accepted warning"
+            )
 
     artifacts = manifest.get("artifacts")
     if not isinstance(artifacts, dict):
         result.error("experiment.json artifacts must be an object")
         return
 
-    require_summary = stage in {"REVIEW", "ANALYSIS", "DECISION"} or (
+    require_summary = (
         stage == "EXPERIMENT" and status in RESULT_STATUSES
+    ) or (
+        stage == "REVIEW" and profile in {"STANDARD", "PAPER"}
+    ) or (
+        stage in {"ANALYSIS", "DECISION"} and profile != "LEGACY_AUDIT"
     )
     require_analysis = stage in {"ANALYSIS", "DECISION"} and status != "RUNNING"
     require_decision = stage == "DECISION" and status != "RUNNING"
@@ -301,8 +506,9 @@ def _validate_summary(
             result.error("manifest and legacy summary experiment_id values differ")
         return
 
-    if summary.get("schema_version") != SCHEMA_VERSION:
-        result.error(f"results/summary.json schema_version must be {SCHEMA_VERSION}")
+    if summary.get("schema_version") != SUMMARY_SCHEMA_VERSION:
+        result.error(
+            f"results/summary.json schema_version must be {SUMMARY_SCHEMA_VERSION}")
         return
 
     _require_keys(
@@ -333,8 +539,19 @@ def _validate_summary(
     if not isinstance(experiment_id, str) or not experiment_id.strip():
         result.error("results/summary.json experiment_id must be a non-empty string")
     hypothesis_id = summary.get("hypothesis_id")
-    if not isinstance(hypothesis_id, str) or not hypothesis_id.strip():
-        result.error("results/summary.json hypothesis_id must be a non-empty string")
+    manifest_profile = manifest.get("profile") if manifest else None
+    hypothesis_optional = (
+        manifest is not None
+        and manifest_profile in {"LITE", "LEGACY_AUDIT"}
+        and manifest.get("hypothesis_id") is None
+    )
+    if hypothesis_id is None and hypothesis_optional:
+        pass
+    elif not _is_nonempty_string(hypothesis_id):
+        result.error(
+            "results/summary.json hypothesis_id must be a non-empty string "
+            "unless its LITE or LEGACY_AUDIT manifest uses null"
+        )
 
     if manifest and experiment_id != manifest.get("experiment_id"):
         result.error("manifest and summary experiment_id values differ")
@@ -367,8 +584,16 @@ def _validate_summary(
     else:
         if not isinstance(primary_metric.get("name"), str) or not primary_metric.get("name"):
             result.error("primary_metric.name must be a non-empty string")
-        if primary_metric.get("direction") not in {"minimize", "maximize"}:
-            result.error("primary_metric.direction must be 'minimize' or 'maximize'")
+        if primary_metric.get("direction") not in {
+            "minimize",
+            "maximize",
+            "target",
+            "none",
+        }:
+            result.error(
+                "primary_metric.direction must be 'minimize', 'maximize', "
+                "'target', or 'none'"
+            )
 
     for key in (
         "config_overrides",
@@ -518,7 +743,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--strict",
         action="store_true",
-        help="Return non-zero when compatibility or accepted-warning notices exist.",
+        help="Require the current manifest schema and return non-zero on warnings.",
     )
     return parser
 
@@ -530,9 +755,15 @@ def main() -> int:
         print(f"ERROR: {message}")
     for message in result.warnings:
         print(f"WARNING: {message}")
+    for message in result.notices:
+        print(f"NOTICE: {message}")
     if not result.errors and not result.warnings:
         print(f"PASS: {args.experiment_dir}")
-    print(f"Result: {len(result.errors)} error(s), {len(result.warnings)} warning(s)")
+    print(
+        f"Result: {len(result.errors)} error(s), "
+        f"{len(result.warnings)} warning(s), "
+        f"{len(result.notices)} notice(s)"
+    )
     return result.exit_code(args.strict)
 
 

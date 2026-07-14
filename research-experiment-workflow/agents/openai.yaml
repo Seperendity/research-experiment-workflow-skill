@@ -1,4 +1,4 @@
 interface:
   display_name: "Research Experiment Workflow"
-  short_description: "Protocol-locked experiments with traceable evidence"
-  default_prompt: "Use $research-experiment-workflow to turn this idea into a protocol-locked, artifact-gated experiment with an evidence-backed next decision."
+  short_description: "Profiled experiments with traceable evidence"
+  default_prompt: "Use $research-experiment-workflow to inspect existing artifacts, select the smallest valid rigor profile, lock the evaluation and statistical protocol, and produce the next evidence-backed artifact or decision."

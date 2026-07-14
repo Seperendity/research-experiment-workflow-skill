@@ -10,9 +10,10 @@
 
 ## 它解决什么问题
 
-- **稳定的研究流程**：覆盖 idea scoring、hypothesis、novelty check、feasibility、protocol lock、pilot、experiment run、review、analysis、decision 和 writing。
-- **可恢复的实验记录**：使用 `experiment.json` manifest，并提供 protocol、run、review、analysis、debug、ablation 和 decision 模板。
-- **研究防护栏**：锁定评价边界，并检查 baseline、新颖性风险、数据泄漏、指标误用、事后筛选和 artifact 失效条件。
+- **与任务风险匹配的 workflow profile**：用 `LITE`、`STANDARD`、`PAPER` 和 `LEGACY_AUDIT` 匹配不同证据强度，不再强迫所有任务走同一条重流程。
+- **可恢复的实验记录**：使用 version 3 的 `experiment.json` manifest，并提供 protocol、run、review、analysis、debug、ablation 和 decision 模板。
+- **明确的 gate 语义**：profile-specific 前置门、带理由的 `NOT_APPLICABLE`，以及可追责的人类 warning acceptance，取代含糊的“跳过”。
+- **统计与评价防护栏**：在最终评价前锁定 estimand、分析单位、不确定性、多重比较、失败运行处理、受保护评价边界、baseline 和失效规则。
 - **完整论文写作指导**：覆盖 Abstract、Introduction、Related Work、Method、Experiments、Conclusion、段落流畅性、图表表达、claim-evidence map 和投稿前对抗式自审。
 - **跨项目复用**：具体命令、数据路径和指标留在每个项目里；这个 skill 只负责稳定流程和阶段门。
 
@@ -30,23 +31,27 @@ cp -R research-experiment-workflow-skill/research-experiment-workflow "${CODEX_H
 使用 $research-experiment-workflow，把这个研究想法推进成假设、novelty check、feasibility、锁定 protocol 和 pilot 计划。
 ```
 
-## 流程
+## Workflow Profiles
+
+选择能够支撑预期 claim 的最小 profile。claim 范围扩大前必须升级 profile；不能为了绕过失败证据而降级。
+
+| Profile | 典型用途 | 必需 gates |
+|---|---|---|
+| `LITE` | 有界工程检查和探索性 pilot | Protocol、pilot |
+| `STANDARD` | 内部实证结论和可复现性工作 | Feasibility、protocol、pilot、review |
+| `PAPER` | 面向发表的新颖性、比较性或科学 claim | Novelty、feasibility、protocol、pilot、review |
+| `LEGACY_AUDIT` | 如实审计证据不完整的历史工作 | 不补造历史 gate；记录缺口和 provenance |
+
+对应流程如下：
 
 ```text
-idea scoring
-  -> hypothesis
-  -> novelty check
-  -> feasibility
-  -> protocol lock
-  -> pilot
-  -> experiment run
-  -> review
-  -> analysis
-  -> decision
-  -> writing
+PAPER:         idea/hypothesis -> novelty -> feasibility -> protocol -> pilot -> run -> review -> analysis -> decision
+STANDARD:      hypothesis -> feasibility -> protocol -> pilot -> run -> review -> analysis -> decision
+LITE:          protocol -> pilot -> run -> analysis -> decision
+LEGACY_AUDIT:  artifact inventory -> gap/provenance record -> analysis -> decision
 ```
 
-新研究方向建议走完整流程。已有项目则从最近一个有效 artifact 继续，不要从头重来。
+Paper story 和 writing 在实验生命周期之后消费已 review 的证据，不是 `experiment.json.stage` 的取值。已有项目应从最近一个有效 artifact 继续，不要从头重来。
 
 ## 仓库结构
 
@@ -71,7 +76,7 @@ research-experiment-workflow/
 - `references/paper-writing-*.md` 包含来自 `Master-cai/Research-Paper-Writing-Skills` 的章节写作指南和扁平化 example bank。
 - `agents/openai.yaml` 提供 Codex UI 元信息和默认 prompt。
 
-兼容模式用于旧实验，新实验可使用 strict 模式：
+新 manifest 使用 `experiment.json` schema version 3；`results/summary.json` 仍使用 schema version 2。非 strict 模式可读取 version 2 manifest 和无 schema 的旧 summary，但会产生兼容性 warning。Strict 模式拒绝 warning；version 3 中带完整人类授权信息的 warning acceptance 只记为 notice。
 
 ```bash
 python research-experiment-workflow/scripts/validate_experiment.py path/to/experiment
@@ -91,6 +96,7 @@ python research-experiment-workflow/scripts/validate_experiment.py path/to/exper
 
 项目目标：构建个人知识库问答系统。
 研究想法：验证 hybrid retrieval（BM25 + embedding rerank）是否比 pure embedding retrieval 更能找回相关笔记。
+Workflow profile：PAPER，因为预期输出包含 novelty claim 和面向论文的正文。
 请先不要写代码，先做 idea scoring、hypothesis、novelty check 和 feasibility。
 ```
 
@@ -126,8 +132,10 @@ research/
 
 ```text
 使用 $research-experiment-workflow，为这个实验锁定最小 protocol。
-在 PROTOCOL.md 中记录主指标及方向、baseline、评价边界、运行预算、
-停止与选择规则、允许修改范围和成功判定。
+在 PROTOCOL.md 中记录预期 claim、estimand、分析单位、主指标及方向、baseline、
+受保护的评价边界和 tuning/final-test 边界、sample/repeat 与 seed 依据、不确定性方法、
+失败运行与多重比较处理、运行预算、停止/选择规则、允许修改范围，
+以及 success、failure 或 inconclusive 判定。
 ```
 
 接着先跑 pilot：
@@ -187,6 +195,8 @@ research/
 
 ## 设计原则
 
+- **Proportionality first**：使用能够支撑预期 claim 的最小 profile；claim 扩大前先升级 profile。
+- **Statistics first**：最终评价前锁定 target quantity、分析单位、不确定性、多重性、缺失数据处理和决策规则。
 - **Baseline first**：没有复现或明确替代 baseline，不声称提升。
 - **Protocol first**：在正式运行前锁定评价边界和决策规则。
 - **Pilot first**：重大改动先通过最小 pilot，再扩大实验。

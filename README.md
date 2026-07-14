@@ -10,9 +10,10 @@ This skill helps Codex act less like an eager code generator and more like a dis
 
 ## What It Provides
 
-- **A staged research workflow**: idea scoring, hypothesis, novelty check, feasibility, protocol lock, pilot, experiment run, review, analysis, decision, and writing.
-- **Durable experiment artifacts**: a resumable `experiment.json` manifest plus protocol, run, review, analysis, debug, ablation, and decision templates.
-- **Research guardrails**: locked evaluation boundaries, baseline checks, novelty risk, leakage checks, metric misuse, post-hoc selection, and explicit invalidation rules.
+- **Proportional workflow profiles**: `LITE`, `STANDARD`, `PAPER`, and `LEGACY_AUDIT` match evidence burden to the intended claim instead of forcing every task through one pipeline.
+- **Durable experiment artifacts**: a resumable version 3 `experiment.json` manifest plus protocol, run, review, analysis, debug, ablation, and decision templates.
+- **Explicit gate semantics**: profile-specific prerequisites, justified `NOT_APPLICABLE` gates, and human-attributed warning acceptance replace ambiguous skip behavior.
+- **Statistical and evaluation guardrails**: estimands, units of analysis, uncertainty, multiple comparisons, failed-run handling, protected evaluation boundaries, baseline checks, and invalidation rules are locked before final evaluation.
 - **Complete paper-writing guidance**: reviewer-facing guidance for Abstract, Introduction, Related Work, Method, Experiments, Conclusion, paragraph flow, figure/table presentation, claim-evidence maps, and adversarial self-review.
 - **Cross-project reuse**: project-specific commands and metrics stay in each repo; the reusable skill keeps the process consistent.
 
@@ -30,23 +31,27 @@ Then invoke it from any Codex session:
 Use $research-experiment-workflow to turn this idea into a hypothesis, novelty check, feasibility report, locked protocol, and pilot plan.
 ```
 
-## Workflow
+## Workflow Profiles
+
+Choose the smallest profile that can support the intended claim. Upgrade before broadening a claim; never downgrade to bypass failed evidence.
+
+| Profile | Typical use | Required gates |
+|---|---|---|
+| `LITE` | Bounded engineering checks and exploratory pilots | Protocol, pilot |
+| `STANDARD` | Internal empirical conclusions and reproducibility work | Feasibility, protocol, pilot, review |
+| `PAPER` | Publication-facing novelty, comparative, or scientific claims | Novelty, feasibility, protocol, pilot, review |
+| `LEGACY_AUDIT` | Honest inspection of incomplete historical evidence | No retroactive gates; record gaps and provenance |
+
+The resulting paths are:
 
 ```text
-idea scoring
-  -> hypothesis
-  -> novelty check
-  -> feasibility
-  -> protocol lock
-  -> pilot
-  -> experiment run
-  -> review
-  -> analysis
-  -> decision
-  -> writing
+PAPER:         idea/hypothesis -> novelty -> feasibility -> protocol -> pilot -> run -> review -> analysis -> decision
+STANDARD:      hypothesis -> feasibility -> protocol -> pilot -> run -> review -> analysis -> decision
+LITE:          protocol -> pilot -> run -> analysis -> decision
+LEGACY_AUDIT:  artifact inventory -> gap/provenance record -> analysis -> decision
 ```
 
-Use the whole pipeline for new research directions. For ongoing projects, resume from the latest valid artifact instead of restarting.
+Paper story and writing consume reviewed evidence after the experiment lifecycle; they are not values of `experiment.json.stage`. For ongoing projects, resume from the latest valid artifact instead of restarting.
 
 ## Repository Layout
 
@@ -71,7 +76,7 @@ research-experiment-workflow/
 - `references/paper-writing-*.md` contains section-specific writing guides and flattened example banks adapted from `Master-cai/Research-Paper-Writing-Skills`.
 - `agents/openai.yaml` provides Codex UI metadata and a default prompt.
 
-Validate an experiment in compatibility mode, or use strict mode for new work:
+New manifests use `experiment.json` schema version 3; `results/summary.json` remains schema version 2. Non-strict validation reads version 2 manifests and schema-less legacy summaries with compatibility warnings. Strict mode rejects warnings, while a complete, human-attributed version 3 warning acceptance is reported as a notice.
 
 ```bash
 python research-experiment-workflow/scripts/validate_experiment.py path/to/experiment
@@ -91,6 +96,7 @@ Use $research-experiment-workflow to set up the experiment workflow for this new
 
 Project goal: build a personal knowledge-base QA system.
 Research idea: test whether hybrid retrieval (BM25 + embedding rerank) retrieves relevant notes better than pure embedding retrieval.
+Workflow profile: PAPER, because the intended output includes a novelty claim and paper-facing prose.
 Do not write code yet. Start with idea scoring, hypothesis, novelty check, and feasibility.
 ```
 
@@ -126,8 +132,10 @@ Before execution, lock only the comparison rules that must not drift after resul
 
 ```text
 Use $research-experiment-workflow to lock the minimal protocol for this experiment.
-Record the primary metric and direction, baseline, evaluation boundaries, run budget,
-stopping and selection rule, allowed changes, and success rule in PROTOCOL.md.
+Record the intended claim, estimand, unit of analysis, primary metric and direction, baseline,
+protected evaluation and tuning boundaries, sample/repeat and seed rationale, uncertainty method,
+failed-run and multiple-comparison handling, run budget, stopping/selection rule, allowed changes,
+and success, failure, or inconclusive rule in PROTOCOL.md.
 ```
 
 Then run a pilot before scaling:
@@ -187,6 +195,8 @@ Do not invent numbers, baselines, citations, figures, or conclusions.
 
 ## Design Principles
 
+- **Proportionality first**: use the smallest profile that supports the intended claim, then upgrade before expanding the claim.
+- **Statistics first**: lock the target quantity, unit, uncertainty, multiplicity, missing-data handling, and decision rule before final evaluation.
 - **Baseline first**: do not claim improvement until a baseline is reproduced or explicitly replaced.
 - **Protocol first**: lock evaluation boundaries and decision rules before result-bearing execution.
 - **Pilot first**: do not scale a major change until a minimal pilot passes.
