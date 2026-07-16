@@ -1,0 +1,518 @@
+{
+  "schema_version": 1,
+  "experiment_id": "exp-20260714-gpt56-sol-skill-ab",
+  "runner": {
+    "model": "gpt-5.6-sol",
+    "reasoning_effort": "medium",
+    "surface": "codex exec",
+    "ephemeral": true,
+    "ignored_user_config": true,
+    "sandbox": "read-only",
+    "seed_exposed": false,
+    "forward_calls": 26,
+    "infrastructure_retries": 0
+  },
+  "snapshots": {
+    "baseline_ref": "1d088cd8413d2cae0aacb5ba1db3ba0bed6296a8",
+    "baseline_skill_sha256": "7a1c5e8c4d7b501e1fc12fe62881180aa332fdc94c91d7d534407e6ac0ec977b",
+    "baseline_openai_yaml_sha256": "ddc9eb4498223b3e4270283caa7670e5269e010a2ff403266e959efe17b0cc18",
+    "candidate_skill_sha256": "d896440b3b5252f9758302d7dd936bb36b80c87aa5b095b5576c2ce3bff6b1ae",
+    "candidate_openai_yaml_sha256": "f21d35ccf4426622887758ad9c7915ef8da2f1638a1f15c0010fe2cdecff5138"
+  },
+  "runs": [
+    {
+      "output_id": "paper-S1",
+      "case_id": "paper_new_direction",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": true,
+      "selected_profile": "PAPER",
+      "response_characters": 661,
+      "response": "Blocked on missing source material: the research idea itself and any existing experiment artifacts were not provided, so I cannot create valid artifacts without inventing content. Proposed action: provide the idea (intended claim, rationale, proposed test, expected outcome, and key risks) plus the experiment directory or existing experiment.json if this resumes prior work. I will then produce the smallest next non-code artifacts: a scored research/ideas.json entry and falsifiable hypothesis record, followed by NOVELTY.md and FEASIBILITY.md for the required PAPER gates. No protocol, pilot, implementation, citations, results, or claims will be fabricated.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 37.849,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/paper-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "paper-S2",
+      "case_id": "paper_new_direction",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": true,
+      "selected_profile": "PAPER",
+      "response_characters": 543,
+      "response": "The PAPER profile is required because the intended work is publication-facing. No research idea, project artifacts, or evidence were provided, so I cannot truthfully create the next artifact or invent a claim. Proposed action: provide the research idea—ideally including the intended claim, method, data/domain, baseline or control, target metric, and available evidence. I will then produce the smallest valid initial artifact, beginning with a falsifiable hypothesis and the novelty/feasibility gates; no code or experiments will be started.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 25.721,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/paper-S2.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "resume-S1",
+      "case_id": "standard_resume_existing",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": true,
+      "selected_profile": null,
+      "response_characters": 569,
+      "response": "Blocked: I could not access the skill package or the existing experiment.json because the read-only execution sandbox failed before any file could be read (`bwrap: Failed to make / slave: Permission denied`). Without the manifest and its routed evidence artifacts, selecting a profile or proposing an evidence-backed decision would require inventing evidence. Proposed action: restore readable sandbox access or provide experiment.json and the artifact-contract-routed files it references; then resume from the latest valid stage and determine the next recorded action.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 30.934,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/resume-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "resume-S2",
+      "case_id": "standard_resume_existing",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": true,
+      "selected_profile": null,
+      "response_characters": 378,
+      "response": "Blocked: no experiment.json exists in the provided workspace, so I cannot determine the existing profile, validate its evidence chain, or produce an evidence-backed decision without inventing artifacts. Proposed action: provide the experiment directory or place the existing experiment.json and its referenced artifacts in the workspace; then resume from its latest valid stage.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 40.594,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/resume-S2.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "lite-S1",
+      "case_id": "lite_bounded_comparison",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": true,
+      "selected_profile": "LITE",
+      "response_characters": 1030,
+      "response": "Selected LITE because this is a bounded local comparison with no novelty or paper-strength claims. No experiment files or execution evidence were provided, so I cannot truthfully mark the protocol LOCKED or the pilot PASS. Proposed action: create a schema-v3 experiment package with PROTOCOL.md and PILOT.md; keep the protocol gate PENDING and pilot gate PENDING until you provide the compared configurations/commands, baseline, target quantity, unit of analysis, primary metric and direction, evaluation and tuning boundaries, run/seed/timeout/retry budget, uncertainty and failed-run handling, stopping/selection and success rules, expected artifacts, and the change-specific pilot sanity check. Then lock the protocol, run only the shortest meaningful execution path, mark the pilot PASS only if the build, interface/schema, finite-output, artifact, protocol-applicability, and sanity checks all pass, and validate the package strictly. No result-bearing comparison, novelty claim, or paper claim should follow from this pilot.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 34.278,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/lite-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "lite-S2",
+      "case_id": "lite_bounded_comparison",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": true,
+      "selected_profile": "LITE",
+      "response_characters": 1237,
+      "response": "Selected `LITE` because this is a bounded local comparison with no novelty or paper-strength claim.\n\nProposed action: create a schema-v3 `experiment.json` at stage `PROTOCOL`, plus `PROTOCOL.md` and `PILOT.md`. Keep both protocol and pilot gates `PENDING` initially. Mark novelty, feasibility, and review `NOT_APPLICABLE` with profile-specific rationales.\n\nThe protocol cannot honestly be marked `LOCKED` until the comparison variants, target quantity, unit of analysis, primary metric and direction, baseline/control, evaluation and tuning boundaries, run budget, repeat/seed rationale, aggregation and uncertainty method, failure/exclusion handling, stopping rule, allowed changes, and success/failure/inconclusive rule are supplied.\n\nAfter locking those fields, run only the smallest meaningful pilot. It must verify the build, main execution path, interfaces or schemas, metric/output health, expected artifact creation, continued applicability of the locked protocol, and a comparison-specific sanity check. Record `PASS` only from observed evidence; otherwise record `FAIL`. Stop after the pilot—do not run the result-bearing comparison or make comparative claims. No files, results, citations, or evidence were assumed or created.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 48.608,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/lite-S2.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "metric-S1",
+      "case_id": "material_protocol_change",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": true,
+      "selected_profile": "PAPER",
+      "response_characters": 2107,
+      "response": "Proposed action: `REVISE`. Do not overwrite the completed experiment or retroactively relabel its primary metric. Preserve its original PAPER evidence chain, record a `DECISION.md` entry selecting `REVISE`, and create a PAPER child experiment with the original experiment as `parent_experiment_id`.\n\nIn the child experiment, revise the hypothesis if the target quantity changed, rewrite and lock `PROTOCOL.md` with the new primary metric and decision rule, then reset the protocol, pilot, and review gates to `PENDING`. Reassess feasibility for metric availability and scientific validity. Recheck novelty only if the contribution or claim scope changed.\n\nArtifact validity:\n- Original protocol, summary, analysis, review, decision, and paper claims remain valid only for the original metric and claim.\n- Novelty evidence may carry forward if the contribution is unchanged.\n- Feasibility may carry forward only after confirming the new metric requires no materially different data, code, compute, or validity assumptions.\n- Immutable configs, logs, and raw per-unit outputs remain valid provenance. They may support recomputation only if they contain everything required by the new metric.\n- The original pilot does not validate the new metric’s computation or schema; rerun the affected sanity checks.\n- Existing `results/summary.json`, `analysis.md`, `REVIEW.md`, `DECISION.md`, figures, tables, and quantitative prose cannot support the new primary claim; regenerate and review them.\n\nBecause the protected final-test results have already been observed, promoting a metric afterward is post-hoc. Results computed on that same test set must be labeled exploratory, even if the metric was previously secondary. A confirmatory paper claim requires a fresh untouched evaluation boundary or replication locked before observation.\n\nNo experiment artifacts were provided, so no file-specific validity determination or modification can be made. After updating the actual child manifest and artifacts, run `scripts/validate_experiment.py <experiment-dir> --strict` before presenting the revised stage as complete.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 85.617,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/metric-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "metric-S2",
+      "case_id": "material_protocol_change",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": true,
+      "selected_profile": "PAPER",
+      "response_characters": 2195,
+      "response": "Proposed action: `REVISE`. Keep the completed experiment package immutable, mark its original primary-metric claim as superseded, and create a revised protocol—preferably in a child experiment linked by `parent_experiment_id`. Do not downgrade the `PAPER` profile.\n\nChanging the primary metric is a material protocol change. The revised experiment must lock the new metric, direction, estimand, decision rule, aggregation/uncertainty method, baseline comparison, and tuning/final-test boundary before new result-bearing evaluation. Because the original protected results have already been observed, a post-hoc metric choice is exploratory and cannot support a new confirmatory paper claim; use a fresh protected evaluation unless documentary evidence shows this is merely correction of a pre-specified recording error.\n\nArtifact validity:\n- Usually still valid: configuration snapshots, provenance, run notes, and raw outputs, but only as historical/source data—not automatically as evidence for the revised claim.\n- Conditionally valid: `NOVELTY.md`, the hypothesis entry, and `FEASIBILITY.md`, only if the claim scope, target quantity, data requirements, and validity risks are unchanged. Reassess otherwise.\n- Invalidated for the revised claim: the locked `PROTOCOL.md` and protocol gate; the pilot gate until compatibility with the revised protocol is re-established; `results/summary.json` primary-metric aggregates and baseline deltas; `REVIEW.md`; `analysis.md`; `DECISION.md`; and all paper figures, tables, or prose relying on the former primary metric.\n- Existing secondary-metric values may remain factual observations, but redesignating one as primary after seeing outcomes must be labeled exploratory.\n\nFor an in-place revision, set `PROTOCOL.md` to `INVALIDATED`, the protocol gate to `FAIL`, and `experiment.json.status` to `INVALIDATED`; reset affected downstream gates to `PENDING`. Record `REVISE` in `DECISION.md` with the validity inventory above. After artifacts are actually supplied and updated, run `scripts/validate_experiment.py <experiment-dir> --strict`. No experiment files were provided, so no concrete paths, results, or gate states can be verified or changed yet.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 38.5,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/metric-S2.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "base-S1",
+      "case_id": "analysis_missing_baseline",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": true,
+      "selected_profile": "STANDARD",
+      "response_characters": 712,
+      "response": "Proposed action: DEBUG. The missing planned baseline artifact blocks the required STANDARD review and any comparative analysis; no improvement, delta, or decision claim is supportable from the available information. Record the issue as an ARTIFACT failure in DEBUG.md with status BLOCKED, preserve the completed non-baseline runs as unreviewed evidence, and reproduce or recover the baseline under the locked protocol. Then update results/summary.json, run strict validation, complete REVIEW.md, and only afterward produce analysis.md and DECISION.md. If the baseline cannot be recovered, invalidate the comparative evidence or formally revise the protocol before new runs; do not substitute an assumed baseline.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 38.788,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/base-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "base-S2",
+      "case_id": "analysis_missing_baseline",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": true,
+      "selected_profile": "STANDARD",
+      "response_characters": 646,
+      "response": "Proposed action: REPLICATE the planned baseline under the locked protocol and regenerate the result package before confirmatory analysis. The missing baseline artifact makes the STANDARD evidence package incomplete: mark review as FAIL and the experiment as BLOCKED or PARTIAL, report no improvement or comparative conclusion, and treat existing treatment-run metrics as descriptive only. After the baseline is saved, rerun review and analysis using the predeclared aggregation, uncertainty, missing-run, and decision rules. No run artifacts or experiment directory were provided, so no artifact-specific quantitative findings can be established.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 41.822,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/base-S2.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "legacy-S1",
+      "case_id": "legacy_evidence_audit",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": true,
+      "selected_profile": "LEGACY_AUDIT",
+      "response_characters": 823,
+      "response": "Proposed action: perform a compatibility audit of the historical logs and figures and produce `REVIEW.md`. Inventory each artifact and its provenance, trace every figure and reported value back to available log data, and assess baseline/control identity, configurations, seeds or repeats, aggregation and uncertainty, exclusions or failed runs, data/evaluation boundaries, and reproducibility. Explicitly record every unverifiable item as an evidence gap and classify findings only after inspecting the artifacts. Do not reconstruct or fabricate a historical manifest, protocol, gate approval, result, or claim of compliance. Any conclusions must be limited to what the preserved evidence directly supports; recommend a prospective replication with a locked protocol if the missing history prevents reliable interpretation.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 54.427,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/legacy-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "legacy-S2",
+      "case_id": "legacy_evidence_audit",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": true,
+      "selected_profile": "LEGACY_AUDIT",
+      "response_characters": 706,
+      "response": "Proposed action: preserve the historical package unchanged and perform a compatibility audit. Inventory the available logs and figures, record their provenance and traceability, and create a REVIEW.md describing missing protocol, manifest, controls, baseline, evaluation boundaries, run configuration, seeds, exclusions, and statistical-plan evidence. Then produce an explicitly exploratory analysis.md limited to claims supported by those artifacts, followed by DECISION.md with exactly one evidence-based next action. Do not reconstruct a protocol, fabricate an experiment.json, or imply retrospective compliance. The experiment directory or artifact paths are required before the audit itself can begin.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 55.594,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/legacy-S2.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "story-S1",
+      "case_id": "paper_story_before_results",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": true,
+      "selected_profile": "PAPER",
+      "response_characters": 3125,
+      "response": "Use a provisional, evidence-gated story—not a results narrative.\n\nOne-sentence contribution template: “We propose [method/system] for [problem], hypothesizing that [mechanism] improves [locked target quantity] relative to [reproduced baseline] under [evaluation boundary].” This is a hypothesis until reviewed analysis exists.\n\nProposed claims:\n1. C1 — Method claim: the approach introduces [specific technical contribution]. Evidence: method specification and implementation checks. Status: needs evidence.\n2. C2 — Primary comparative claim: it improves [primary metric] over [baseline/control]. Evidence: protocol-compliant repeated evaluation, effect size, and uncertainty. Status: planned; no conclusion permitted yet.\n3. C3 — Mechanism claim: [component/mechanism] accounts for the improvement. Evidence: controlled ablations changing one factor at a time. Status: planned.\n4. C4 — Robustness claim: the effect persists across [predeclared settings/datasets/subgroups]. Evidence: locked robustness suite and failure analysis. Status: planned.\n5. C5 — Novelty claim: the contribution differs materially from close prior work. Evidence: completed novelty review with citations. Status: needs evidence; do not state as established.\n\nPlanned figures:\n- Figure 1: teaser and pipeline diagram showing the problem, intervention, and hypothesized mechanism; conceptual only.\n- Figure 2: primary comparison with uncertainty and all locked baselines; populate only from reviewed results.\n- Figure 3: one-factor ablation or mechanism test tied to C3.\n- Figure 4: robustness, sensitivity, and failure cases, including negative or inconclusive outcomes.\n- Optional table: protocol coverage, compute/run counts, missing runs, and comparison conditions.\n\nSuggested section story:\n- Introduction: problem → evidence gap → hypothesis → proposed contribution, with unverified claims labeled.\n- Method: design and predicted mechanism without outcome language.\n- Experiments: locked estimand, unit of analysis, baselines, protected evaluation boundary, uncertainty method, and decision rule.\n- Results: reserved for reviewed confirmatory findings; exploratory observations remain separate.\n- Limitations: failed runs, scope limits, novelty uncertainty, and unsupported generalization.\n\nOpen evidence gaps:\n- No concrete hypothesis, method, domain, or target quantity was supplied.\n- Novelty and claim-collision review is absent.\n- Feasibility, baseline availability, data boundaries, and compute budget are unknown.\n- The statistical protocol and success/inconclusive rules are not locked.\n- Pilot validity, reproduced baselines, result artifacts, ablations, robustness checks, and independent review are incomplete or unavailable.\n\nProposed immediate action: instantiate this roadmap with the actual hypothesis and then complete the PAPER gates in order—novelty, feasibility, protocol lock, pilot, experiment, and review. Keep every figure placeholder and claim marked “planned/needs evidence” until it points to a saved artifact or citation. Do not draft quantitative, comparative, causal, or novelty conclusions before reviewed analysis.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 52.22,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/story-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "story-S2",
+      "case_id": "paper_story_before_results",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": true,
+      "selected_profile": "PAPER",
+      "response_characters": 2818,
+      "response": "Proposed action: create a provisional paper-story roadmap under the `PAPER` profile, with every unobserved result labeled as planned rather than claimed.\n\nStory spine:\n1. Problem and significance — define the concrete research problem, affected setting, and limitation of existing approaches.\n2. Falsifiable central claim — “[Method] improves [target quantity] over [specified baselines] under [locked evaluation boundary], while preserving [constraint].” Status: needs evidence.\n3. Mechanistic claim — identify why the method should work and the ablation or diagnostic that could falsify that explanation. Status: needs evidence.\n4. Scope claim — state where the method is expected to work, plus explicit exclusions and failure conditions. Status: needs evidence.\n5. Contribution framing — separate the proposed methodological, empirical, and analytical contributions; novelty remains unresolved until supported by prior-work citations.\n\nPlanned figures:\n- Figure 1: problem/teaser showing the intended contribution without numerical conclusions.\n- Figure 2: method or experimental pipeline, including tuning versus protected final-test boundaries.\n- Figure 3: primary comparison against reproduced baselines, with uncertainty and unit of analysis.\n- Figure 4: controlled ablations testing the proposed mechanism.\n- Figure 5: robustness, subgroup behavior, compute/cost trade-offs, and failure cases.\n- Table 1: main quantitative results with prespecified metrics and uncertainty.\n\nEvidence gaps:\n- Exact hypothesis, target quantity, and decision rule.\n- Novelty review and supporting citations.\n- Feasibility evidence for data, code, compute, and validity risks.\n- Locked protocol: datasets/splits, baselines, metrics, unit of analysis, tuning boundary, uncertainty method, failure handling, and budget.\n- Successful pilot demonstrating the smallest meaningful execution path.\n- Reproduced baseline results and saved run/config artifacts.\n- Evidence for mechanism through ablations or diagnostics.\n- Robustness, negative-result, and failure-case analysis.\n- Required review confirming protocol adherence before any quantitative, comparative, novelty, or causal conclusion is presented as supported.\n\nClaim-evidence map:\n- Main comparative claim | Planned Figure 3/Table 1 | needs evidence\n- Mechanistic explanation | Planned Figure 4 | needs evidence\n- Robustness and scope | Planned Figure 5 | needs evidence\n- Novelty claim | Prior-work review and citations | needs evidence\n\nImmediate action: `REVISE` — provide the research question, proposed method, intended baselines, evaluation setting, and any existing experiment artifacts; then lock the claims and protocol before result-bearing evaluation. No experimental result or publication-strength conclusion can currently be asserted from the supplied information.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 37.973,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/story-S2.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "draft-S1",
+      "case_id": "paper_draft_from_reviewed_evidence",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": true,
+      "selected_profile": "PAPER",
+      "response_characters": 635,
+      "response": "Proposed action: draft the publication-facing Experiments section under the PAPER profile using only the reviewed analysis.md, results/summary.json, and referenced figures. I could not access those artifacts because the workspace read attempt was blocked by the sandbox (`bwrap: Failed to make / slave: Permission denied`), so I cannot produce evidence-grounded prose without inventing content. Once access is available, I will verify the review gate, extract only supported setup details and findings, then return a compact outline, role-labeled draft paragraphs, claim–evidence map, self-review checklist, and explicit evidence gaps.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 61.615,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/draft-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "draft-S2",
+      "case_id": "paper_draft_from_reviewed_evidence",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": true,
+      "selected_profile": "PAPER",
+      "response_characters": 681,
+      "response": "Proposed action: draft an evidence-grounded Experiments section using the PAPER profile, including a 3–7 point outline, paragraph roles, setup/results/ablation or limitation prose as supported, figure/table references, a claim–evidence map, and a self-review checklist.\n\nThe draft is currently blocked because the requested `analysis.md`, figures, and `results/summary.json` were not provided with exact paths or contents. Please provide those artifacts, plus the applicable `REVIEW.md` or review status. I will use only reviewed evidence with a PASS or properly accepted WARNING, reproduce no unsupported numbers or figure claims, and explicitly label any remaining evidence gaps.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 47.753,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/draft-S2.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "unit-S1",
+      "case_id": "ordinary_unit_test_failure",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": false,
+      "selected_profile": null,
+      "response_characters": 330,
+      "response": "The skill does not apply: its metadata covers research experiments and evidence workflows, not unit-test debugging. I cannot fix or run the test because you prohibited inspecting the workspace and modifying files. Proposed action: permit inspection of src/parser.py and the targeted test files, plus file edits and test execution.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 26.907,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/unit-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "unit-S2",
+      "case_id": "ordinary_unit_test_failure",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": false,
+      "selected_profile": null,
+      "response_characters": 487,
+      "response": "The skill does not apply because its policy explicitly excludes ordinary debugging and unit tests. I could not inspect or modify `src/parser.py`, identify the targeted suite, or run tests because this request prohibits workspace inspection and the session is read-only. Proposed action: allow access to the relevant source/test files and write permission; then I’ll diagnose the failure, patch `src/parser.py`, and run the targeted test command discovered from the project configuration.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 38.368,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/unit-S2.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "pydebug-S1",
+      "case_id": "generic_python_debug",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": false,
+      "selected_profile": null,
+      "response_characters": 274,
+      "response": "Please paste the complete Python stack trace, including the exception type and final error message. If possible, also include the relevant code around the first stack frame from your own project. Without the trace, I can’t diagnose the root cause without inventing evidence.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 21.546,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/pydebug-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "pydebug-S2",
+      "case_id": "generic_python_debug",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": false,
+      "selected_profile": null,
+      "response_characters": 322,
+      "response": "Please paste the complete Python traceback, including the exception type/message and every stack frame. If possible, also include the referenced code around the final application-owned frame and what command or input triggered it. No stack trace was included, so I can’t identify the root cause without inventing evidence.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 42.813,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/pydebug-S2.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "brain-S1",
+      "case_id": "casual_brainstorm",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": false,
+      "selected_profile": null,
+      "response_characters": 79,
+      "response": "1. Gradient Grove\n2. Latent Lab\n3. Tensor Trail\n4. Model Forge\n5. Signal Sprout",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 38.104,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/brain-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "brain-S2",
+      "case_id": "casual_brainstorm",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": false,
+      "selected_profile": null,
+      "response_characters": 75,
+      "response": "1. ModelForge\n2. Gradient Grove\n3. TensorTrail\n4. SignalSmith\n5. Latent Lab",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 47.715,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/brain-S2.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "summary-S1",
+      "case_id": "generic_document_summary",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": false,
+      "selected_profile": null,
+      "response_characters": 231,
+      "response": "Please attach or paste the technical report. I’ll summarize it for a product manager, focusing on the problem, key findings, customer/business impact, risks, tradeoffs, and recommended next steps—without inventing missing evidence.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 33.07,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/summary-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "summary-S2",
+      "case_id": "generic_document_summary",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": false,
+      "selected_profile": null,
+      "response_characters": 130,
+      "response": "Please provide or attach the technical report you want summarized. I can’t produce an evidence-based summary without its contents.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 49.536,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/summary-S2.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "implicit-S1",
+      "case_id": "implicit_research_request",
+      "variant": "candidate",
+      "neutral_package": "pkg-cobalt",
+      "invoked_skill": true,
+      "selected_profile": "STANDARD",
+      "response_characters": 1353,
+      "response": "Proposed action: define and lock a STANDARD comparison protocol before running either retrieval method.\n\nUse the same corpus, query set, relevance judgments, preprocessing, and evaluation budget for both methods. Keep tuning on a development split and protect the final test split. Treat each query as the paired unit of analysis.\n\nChoose one primary metric based on the task: nDCG@k for graded relevance, Recall@k for candidate-generation coverage, or MRR for first-relevant-result quality. Record latency, throughput, index size, and cost as secondary metrics where relevant. Predefine failure handling and a minimum practically meaningful improvement.\n\nRun a small pilot to verify indexing, query execution, metric computation, artifact capture, and absence of leakage. Then evaluate both methods on identical test queries and report the paired per-query effect with a confidence interval, preferably using paired bootstrap resampling. Do not select the winner from point estimates alone; require the confidence interval and practical threshold to satisfy the locked decision rule.\n\nBefore finalizing the design, provide: the retrieval task and corpus, available relevance labels, the two methods, the intended claim scope, the primary quality objective, operational constraints, and the run budget. No experiment results or evidence are assumed yet.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 49.175,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/implicit-S1.attempt-1.json"
+        }
+      ]
+    },
+    {
+      "output_id": "implicit-S2",
+      "case_id": "implicit_research_request",
+      "variant": "baseline",
+      "neutral_package": "pkg-amber",
+      "invoked_skill": true,
+      "selected_profile": "STANDARD",
+      "response_characters": 2885,
+      "response": "Use a STANDARD workflow because this comparison is intended to support a reusable empirical conclusion, without assuming a publication or novelty claim.\n\nProposed action: lock the following protocol before running either method.\n\n1. Hypothesis: Method A improves retrieval quality over Method B under equal data, indexing, latency, and compute constraints.\n2. Evaluation boundary: Choose representative datasets and freeze train/dev/test splits. Use dev data for tuning; keep test labels hidden until both methods and settings are finalized.\n3. Unit of analysis: Treat each query as the primary unit. Define handling for queries with no relevant documents before evaluation.\n4. Controls: Use the same corpus, preprocessing, document chunks, relevance judgments, candidate limits, hardware, and resource budget. Change only the retrieval method. Record index size, build time, query latency, and memory separately.\n5. Primary metric: Predeclare one retrieval-quality metric appropriate to the task—such as nDCG@k for graded relevance, Recall@k when coverage matters, or MRR when the first relevant result matters. Declare its direction and k in advance. Other metrics are secondary.\n6. Tuning: Give both methods comparable tuning budgets and tune only on the dev split. Freeze hyperparameters and random seeds before final testing.\n7. Repeats and uncertainty: If either method is stochastic, run multiple predeclared seeds. Report the paired per-query difference, an effect size, and a 95% confidence interval using a paired bootstrap or another justified paired method.\n8. Operational metrics: Measure latency after warm-up under identical batch and concurrency settings. Report median and tail latency, index-build cost, index size, and peak memory where relevant.\n9. Failure handling: Predefine timeouts, retry limits, missing-result treatment, exclusions, and the minimum number of completed runs. Preserve failures rather than silently dropping them.\n10. Decision rule: Call A better only if the primary metric’s confidence interval excludes zero in A’s favor and A stays within the agreed resource constraints. Otherwise classify the result as worse or inconclusive; do not select a winner from secondary metrics.\n11. Pilot: Run a small sample first to verify both indexes build, result schemas match, metrics are finite, relevance IDs align, and timing instrumentation works. Do not inspect the final test outcome during the pilot.\n12. Final package: Save configurations, dataset/version identifiers, seeds, logs, per-query outputs, aggregate metrics, uncertainty estimates, resource measurements, deviations, and a concise comparison table.\n\nBefore execution, the remaining inputs to fill in are the two methods, corpus and query sets, relevance-label type, intended deployment constraints, primary metric and cutoff, tuning budget, and practical minimum effect worth detecting.",
+      "attempts": [
+        {
+          "attempt": 1,
+          "exit_code": 0,
+          "elapsed_seconds": 37.706,
+          "valid_output": true,
+          "final_output_path": "/tmp/rew-sol-eval-20260714/outputs/implicit-S2.attempt-1.json"
+        }
+      ]
+    }
+  ]
+}

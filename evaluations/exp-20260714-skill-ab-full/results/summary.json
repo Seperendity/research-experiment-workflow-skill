@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "experiment_id": "exp-20260714-skill-ab-full",
+  "hypothesis_id": null,
+  "status": "DONE",
+  "protocol": "PROTOCOL.md",
+  "primary_metric": {
+    "name": "critical_failure_free_cases",
+    "direction": "maximize"
+  },
+  "config_base": "tests/skill_behavior_cases.json",
+  "config_overrides": {
+    "case_count": 13,
+    "parent_pilot": "exp-20260714-skill-ab-pilot",
+    "heldout_case_count": 9,
+    "responses_per_case_variant": 1,
+    "blind_scoring": true
+  },
+  "runs": [
+    {
+      "run_id": "baseline",
+      "seed": 0,
+      "status": "DONE",
+      "config": {
+        "source": "1d088cd8413d2cae0aacb5ba1db3ba0bed6296a8",
+        "neutral_package": "pkg-amber"
+      },
+      "metrics": {
+        "critical_failure_free_cases": 11,
+        "invocation_correct": 12,
+        "profile_correct": 11,
+        "outcome_coverage_points": 20,
+        "forbidden_behaviors": 2,
+        "total_response_characters": 10405,
+        "mean_response_characters": 800.3846153846154,
+        "median_response_characters": 648
+      },
+      "artifacts": {
+        "heldout_raw_outputs": "heldout_raw_outputs.json",
+        "heldout_blind_scores": "heldout_blind_scores.json",
+        "parent_pilot_summary": "../../exp-20260714-skill-ab-pilot/results/summary.json"
+      },
+      "warnings": [
+        "The under-specified resume case is retained as a profile failure."
+      ]
+    },
+    {
+      "run_id": "candidate",
+      "seed": 0,
+      "status": "DONE",
+      "config": {
+        "source": "working-tree snapshot",
+        "neutral_package": "pkg-cobalt"
+      },
+      "metrics": {
+        "critical_failure_free_cases": 12,
+        "invocation_correct": 13,
+        "profile_correct": 12,
+        "outcome_coverage_points": 24,
+        "forbidden_behaviors": 0,
+        "total_response_characters": 10375,
+        "mean_response_characters": 798.0769230769231,
+        "median_response_characters": 510
+      },
+      "artifacts": {
+        "heldout_raw_outputs": "heldout_raw_outputs.json",
+        "heldout_blind_scores": "heldout_blind_scores.json",
+        "parent_pilot_summary": "../../exp-20260714-skill-ab-pilot/results/summary.json"
+      },
+      "warnings": [
+        "The LITE response was 88.2% longer than baseline."
+      ]
+    }
+  ],
+  "aggregate": {
+    "n_planned": 26,
+    "n_completed": 26,
+    "metrics": {
+      "case_count": 13,
+      "baseline_critical_failure_free_cases": 11,
+      "candidate_critical_failure_free_cases": 12,
+      "candidate_minus_baseline_cases": 1
+    }
+  },
+  "baseline": {
+    "experiment_id": null,
+    "source": "git commit 1d088cd8413d2cae0aacb5ba1db3ba0bed6296a8",
+    "metrics": {
+      "critical_failure_free_cases": 11,
+      "mean_response_characters": 800.3846153846154,
+      "median_response_characters": 648
+    }
+  },
+  "delta_vs_baseline": {
+    "critical_failure_free_cases": 1,
+    "invocation_correct": 1,
+    "profile_correct": 1,
+    "outcome_coverage_points": 4,
+    "forbidden_behaviors": -2,
+    "total_response_characters": -30,
+    "mean_response_characters_percent": -0.3,
+    "median_response_characters_percent": -21.3
+  },
+  "provenance": {
+    "git_commit": "1d088cd8413d2cae0aacb5ba1db3ba0bed6296a8",
+    "data_version": "tests/skill_behavior_cases.json schema version 1",
+    "environment": "local config gpt-5.5/xhigh; fresh collaboration agents; separate runner model identifier unavailable"
+  },
+  "artifacts": {
+    "heldout_raw_outputs": "heldout_raw_outputs.json",
+    "heldout_blind_scores": "heldout_blind_scores.json",
+    "parent_pilot_summary": "../../exp-20260714-skill-ab-pilot/results/summary.json",
+    "analysis": "../analysis.md"
+  },
+  "budget": {
+    "max_runs": 18,
+    "timeout": "no per-run timeout exposed",
+    "retries_used": 0,
+    "stop_reason": "Completed all nine held-out case pairs and pooled them with the parent pilot"
+  },
+  "warnings": [
+    "This evaluation cannot be attributed to GPT-5.6 Sol.",
+    "One response per case-variant pair does not measure stochastic variance.",
+    "The resume case lacks the manifest needed to observe its expected profile.",
+    "Selective reference loading is not directly observable from final response text."
+  ]
+}

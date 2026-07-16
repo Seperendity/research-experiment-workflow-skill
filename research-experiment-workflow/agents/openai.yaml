@@ -1,4 +1,7 @@
 interface:
   display_name: "Research Experiment Workflow"
-  short_description: "Profiled experiments with traceable evidence"
-  default_prompt: "Use $research-experiment-workflow to inspect existing artifacts, select the smallest valid rigor profile, lock the evaluation and statistical protocol, and produce the next evidence-backed artifact or decision."
+  short_description: "Explicit, evidence-gated research workflows"
+  default_prompt: "Use $research-experiment-workflow to produce the next valid research artifact from the available evidence, enforce the selected rigor profile, and stop at blocked gates."
+
+policy:
+  allow_implicit_invocation: false

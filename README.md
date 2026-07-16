@@ -25,11 +25,13 @@ mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
 cp -R research-experiment-workflow-skill/research-experiment-workflow "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
-Then invoke it from any Codex session:
+Then invoke it explicitly from any Codex session:
 
 ```text
 Use $research-experiment-workflow to turn this idea into a hypothesis, novelty check, feasibility report, locked protocol, and pilot plan.
 ```
+
+Implicit invocation is disabled because this workflow creates durable research state and evidence gates. A request to discuss, brainstorm, or design an experiment should use ordinary Codex behavior unless the user explicitly names the skill or asks to create, update, validate, analyze, or resume durable experiment artifacts. The same ordinary behavior applies to routine code debugging, unit tests, generic analysis, and writing that does not depend on experiment artifacts.
 
 ## Workflow Profiles
 
@@ -51,7 +53,7 @@ LITE:          protocol -> pilot -> run -> analysis -> decision
 LEGACY_AUDIT:  artifact inventory -> gap/provenance record -> analysis -> decision
 ```
 
-Paper story and writing consume reviewed evidence after the experiment lifecycle; they are not values of `experiment.json.stage`. For ongoing projects, resume from the latest valid artifact instead of restarting.
+Paper story and writing are not values of `experiment.json.stage`. A provisional story may be planned before experiments finish when planned evidence and open gaps are labeled; paper-ready quantitative, comparative, novelty, and causal claims consume reviewed evidence. For ongoing projects, resume from the latest valid artifact instead of restarting.
 
 ## Repository Layout
 
@@ -69,7 +71,7 @@ research-experiment-workflow/
     paper-writing-*.md
 ```
 
-- `SKILL.md` defines the stage router, gates, role discipline, and operating principles.
+- `SKILL.md` defines profile selection, the core evidence contract, reference routing, and stopping rules.
 - `references/artifact-contract.md` defines the artifact schema, compact templates, review rubric, and writing checks.
 - `scripts/validate_experiment.py` validates manifests, gates, and result summaries without modifying the experiment.
 - `references/paper-writing.md` routes paper drafting, section revision, paragraph-flow checks, figure/table presentation, claim-evidence mapping, and paper self-review.
@@ -203,7 +205,7 @@ Do not invent numbers, baselines, citations, figures, or conclusions.
 - **Novelty before paper claims**: check close prior work before presenting a contribution.
 - **Evidence over memory**: save artifacts that later stages can inspect.
 - **Decision after analysis**: record whether to replicate, ablate, revise, scale, debug, or stop.
-- **Writing after review**: paper prose should consume reviewed analysis, not raw logs.
+- **Claims after review**: provisional story planning may precede experiments, but paper-ready quantitative, comparative, novelty, and causal claims must consume reviewed analysis.
 
 ## Inspiration
 

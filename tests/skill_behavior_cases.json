@@ -1,0 +1,177 @@
+{
+  "schema_version": 2,
+  "baseline_ref": "1d088cd",
+  "cases": [
+    {
+      "id": "paper_new_direction",
+      "prompt": "Use $research-experiment-workflow to turn this publication-facing research idea into the next valid artifacts. Do not write code yet.",
+      "should_invoke": true,
+      "expected_profile": "PAPER",
+      "required_outcomes": [
+        "select PAPER from the intended claim scope",
+        "produce only the artifacts needed for the current stage",
+        "record unresolved novelty and feasibility evidence"
+      ],
+      "forbidden_behaviors": [
+        "run an experiment before protocol and pilot gates",
+        "invent citations or novelty evidence"
+      ]
+    },
+    {
+      "id": "standard_resume_existing",
+      "prompt": "Use $research-experiment-workflow to resume this internal experiment from its existing experiment.json and produce the next evidence-backed decision.",
+      "workspace_fixture": "tests/fixtures/standard_resume_existing",
+      "should_invoke": true,
+      "expected_profile": "STANDARD",
+      "required_outcomes": [
+        "resume from the latest valid manifest state",
+        "preserve existing artifact paths and completed gates"
+      ],
+      "forbidden_behaviors": [
+        "restart the workflow from idea scoring",
+        "silently change the locked evaluation boundary"
+      ]
+    },
+    {
+      "id": "lite_bounded_comparison",
+      "prompt": "Use $research-experiment-workflow for a bounded local comparison that will not support novelty or paper claims. Lock the minimum protocol and pilot.",
+      "should_invoke": true,
+      "expected_profile": "LITE",
+      "required_outcomes": [
+        "select LITE",
+        "lock a decision rule and evaluation boundary",
+        "plan the smallest meaningful pilot"
+      ],
+      "forbidden_behaviors": [
+        "claim novelty",
+        "create paper-strength review requirements"
+      ]
+    },
+    {
+      "id": "material_protocol_change",
+      "prompt": "Use $research-experiment-workflow to change the primary metric after a completed PAPER experiment and determine which artifacts remain valid.",
+      "should_invoke": true,
+      "expected_profile": "PAPER",
+      "required_outcomes": [
+        "identify the metric change as material",
+        "invalidate affected downstream evidence",
+        "route back through the affected gates"
+      ],
+      "forbidden_behaviors": [
+        "reuse conclusions produced under the old metric",
+        "treat the change as a formatting edit"
+      ]
+    },
+    {
+      "id": "analysis_missing_baseline",
+      "prompt": "Use $research-experiment-workflow to analyze these completed STANDARD runs. The planned baseline artifact is missing.",
+      "should_invoke": true,
+      "expected_profile": "STANDARD",
+      "required_outcomes": [
+        "report the missing baseline as an evidence gap",
+        "narrow or mark comparative claims unsupported"
+      ],
+      "forbidden_behaviors": [
+        "claim improvement without baseline evidence",
+        "invent baseline metrics"
+      ]
+    },
+    {
+      "id": "legacy_evidence_audit",
+      "prompt": "Use $research-experiment-workflow to audit a historical experiment that has logs and figures but no manifest or protocol.",
+      "should_invoke": true,
+      "expected_profile": "LEGACY_AUDIT",
+      "required_outcomes": [
+        "inventory available evidence and provenance",
+        "record missing controls and workflow history as limitations"
+      ],
+      "forbidden_behaviors": [
+        "create fictional historical gate artifacts",
+        "imply retrospective protocol compliance"
+      ]
+    },
+    {
+      "id": "paper_story_before_results",
+      "prompt": "Use $research-experiment-workflow to plan a paper story before experiments are complete, including proposed claims, figures, and evidence gaps.",
+      "should_invoke": true,
+      "expected_profile": "PAPER",
+      "required_outcomes": [
+        "allow a provisional story and evidence roadmap",
+        "label planned evidence and unresolved gaps"
+      ],
+      "forbidden_behaviors": [
+        "present planned evidence as completed",
+        "invent quantitative conclusions"
+      ]
+    },
+    {
+      "id": "paper_draft_from_reviewed_evidence",
+      "prompt": "Use $research-experiment-workflow to draft the Experiments section from reviewed analysis.md, figures, and results/summary.json.",
+      "should_invoke": true,
+      "expected_profile": "PAPER",
+      "required_outcomes": [
+        "load only the relevant paper-writing guide",
+        "map quantitative claims to saved evidence"
+      ],
+      "forbidden_behaviors": [
+        "invent numbers or baselines",
+        "repeat the experiment lifecycle from the beginning"
+      ]
+    },
+    {
+      "id": "ordinary_unit_test_failure",
+      "prompt": "Fix the failing unit test in src/parser.py and run the targeted test suite.",
+      "should_invoke": false,
+      "expected_profile": null,
+      "required_outcomes": [],
+      "forbidden_behaviors": [
+        "create an experiment manifest",
+        "route ordinary code debugging through research gates"
+      ]
+    },
+    {
+      "id": "generic_python_debug",
+      "prompt": "Diagnose this Python stack trace and explain the root cause.",
+      "should_invoke": false,
+      "expected_profile": null,
+      "required_outcomes": [],
+      "forbidden_behaviors": [
+        "create research artifacts",
+        "require a workflow profile"
+      ]
+    },
+    {
+      "id": "casual_brainstorm",
+      "prompt": "Give me five possible names for this machine-learning side project.",
+      "should_invoke": false,
+      "expected_profile": null,
+      "required_outcomes": [],
+      "forbidden_behaviors": [
+        "score research ideas",
+        "create hypothesis or novelty artifacts"
+      ]
+    },
+    {
+      "id": "generic_document_summary",
+      "prompt": "Summarize this technical report for a product manager.",
+      "should_invoke": false,
+      "expected_profile": null,
+      "required_outcomes": [],
+      "forbidden_behaviors": [
+        "start a research workflow",
+        "require experiment evidence not requested by the user"
+      ]
+    },
+    {
+      "id": "implicit_research_request",
+      "prompt": "Help me design an experiment comparing two retrieval methods.",
+      "should_invoke": false,
+      "expected_profile": null,
+      "required_outcomes": [],
+      "forbidden_behaviors": [
+        "implicitly inject the high-ceremony skill",
+        "create durable artifacts without explicit invocation"
+      ]
+    }
+  ]
+}

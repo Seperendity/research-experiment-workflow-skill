@@ -1,0 +1,53 @@
+{
+  "schema_version": 3,
+  "experiment_id": "exp-20260714-gpt56-sol-skill-ab",
+  "hypothesis_id": null,
+  "profile": "LITE",
+  "stage": "DECISION",
+  "status": "DONE",
+  "parent_experiment_id": "exp-20260714-skill-ab-full",
+  "gates": {
+    "novelty": {
+      "verdict": "NOT_APPLICABLE",
+      "artifact": null,
+      "rationale": "LITE local engineering replication; no novelty claim",
+      "acceptance": null
+    },
+    "feasibility": {
+      "verdict": "NOT_APPLICABLE",
+      "artifact": null,
+      "rationale": "The earlier A/B evaluation established the read-only harness; this run adds a model-specific structure pilot",
+      "acceptance": null
+    },
+    "protocol": {
+      "verdict": "PASS",
+      "artifact": "PROTOCOL.md",
+      "rationale": null,
+      "acceptance": null
+    },
+    "pilot": {
+      "verdict": "PASS",
+      "artifact": "PILOT.md",
+      "rationale": null,
+      "acceptance": null
+    },
+    "review": {
+      "verdict": "NOT_APPLICABLE",
+      "artifact": null,
+      "rationale": "LITE profile; blind scoring is defined in the locked protocol",
+      "acceptance": null
+    }
+  },
+  "artifacts": {
+    "summary": "results/summary.json",
+    "analysis": "analysis.md",
+    "decision": "DECISION.md",
+    "debug": "DEBUG.md",
+    "ablation": "ABLATION_PLAN.md"
+  },
+  "warnings": [
+    "One sample per case-variant pair does not estimate stochastic variance.",
+    "Cross-model differences are descriptive because reasoning effort differs from the GPT-5.5 parent run.",
+    "Only one local blind scorer was used because external scoring of workspace data was prohibited."
+  ]
+}

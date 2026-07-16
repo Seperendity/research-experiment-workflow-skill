@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "experiment_id": "exp-20260714-resume-fixture",
+  "hypothesis_id": "H-RESUME-001",
+  "status": "DONE",
+  "protocol": "PROTOCOL.md",
+  "primary_metric": {
+    "name": "score",
+    "direction": "maximize"
+  },
+  "config_base": "fixture-v1",
+  "config_overrides": {},
+  "runs": [
+    {
+      "run_id": "baseline-run",
+      "seed": 0,
+      "status": "DONE",
+      "config": {"method": "baseline"},
+      "metrics": {"score": 0.70},
+      "artifacts": {},
+      "warnings": []
+    },
+    {
+      "run_id": "candidate-run",
+      "seed": 0,
+      "status": "DONE",
+      "config": {"method": "candidate"},
+      "metrics": {"score": 0.74},
+      "artifacts": {},
+      "warnings": []
+    }
+  ],
+  "aggregate": {
+    "n_planned": 2,
+    "n_completed": 2,
+    "metrics": {"baseline_score": 0.70, "candidate_score": 0.74}
+  },
+  "baseline": {
+    "experiment_id": null,
+    "source": "baseline-run",
+    "metrics": {"score": 0.70}
+  },
+  "delta_vs_baseline": {"score": 0.04},
+  "provenance": {
+    "git_commit": "fixture",
+    "data_version": "fixture-v1",
+    "environment": "synthetic"
+  },
+  "artifacts": {"run_notes": "../run_notes.md"},
+  "budget": {
+    "max_runs": 2,
+    "timeout": 60,
+    "retries_used": 0,
+    "stop_reason": "completed"
+  },
+  "warnings": []
+}

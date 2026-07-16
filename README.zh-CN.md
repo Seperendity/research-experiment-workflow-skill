@@ -25,11 +25,13 @@ mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
 cp -R research-experiment-workflow-skill/research-experiment-workflow "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
-安装后，在任意 Codex 会话中调用：
+安装后，在任意 Codex 会话中显式调用：
 
 ```text
 使用 $research-experiment-workflow，把这个研究想法推进成假设、novelty check、feasibility、锁定 protocol 和 pilot 计划。
 ```
+
+该 Skill 默认关闭隐式调用，因为它会创建持久化研究状态和证据 gate。仅仅讨论、brainstorm 或设计实验时，应直接使用 Codex 的常规行为；只有用户显式点名该 Skill，或明确要求创建、更新、校验、分析、恢复持久化实验 artifact 时才调用。普通代码调试、单元测试、通用分析，以及不依赖实验 artifact 的写作同样不应触发该 Skill。
 
 ## Workflow Profiles
 
@@ -51,7 +53,7 @@ LITE:          protocol -> pilot -> run -> analysis -> decision
 LEGACY_AUDIT:  artifact inventory -> gap/provenance record -> analysis -> decision
 ```
 
-Paper story 和 writing 在实验生命周期之后消费已 review 的证据，不是 `experiment.json.stage` 的取值。已有项目应从最近一个有效 artifact 继续，不要从头重来。
+Paper story 和 writing 不是 `experiment.json.stage` 的取值。实验完成前可以规划 provisional story，但必须标记计划证据和未解决缺口；面向论文的定量、比较、新颖性和因果 claim 必须消费已 review 的证据。已有项目应从最近一个有效 artifact 继续，不要从头重来。
 
 ## 仓库结构
 
@@ -69,7 +71,7 @@ research-experiment-workflow/
     paper-writing-*.md
 ```
 
-- `SKILL.md` 定义阶段路由、阶段门、角色纪律和操作原则。
+- `SKILL.md` 定义 profile 选择、核心证据契约、reference 路由和停止条件。
 - `references/artifact-contract.md` 定义 artifact schema、紧凑模板、review rubric 和写作检查。
 - `scripts/validate_experiment.py` 只读验证 manifest、gate 和结果摘要，不修改实验目录。
 - `references/paper-writing.md` 负责论文起草、章节改写、段落流畅性检查、图表表达、claim-evidence map 和论文自审的路由。
@@ -203,7 +205,7 @@ research/
 - **Novelty before paper claims**：写论文贡献前先检查相近工作。
 - **Evidence over memory**：把证据写入 artifact，不依赖聊天上下文。
 - **Decision after analysis**：明确记录复现、消融、修订、扩展、调试或停止。
-- **Writing after review**：论文文本消费通过 review 的 analysis，而不是直接消费原始日志。
+- **Claims after review**：provisional story 可以先于实验规划，但论文级定量、比较、新颖性和因果 claim 必须消费已 review 的 analysis。
 
 ## 设计来源
 

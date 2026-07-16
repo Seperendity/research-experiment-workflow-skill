@@ -1,0 +1,49 @@
+{
+  "schema_version": 3,
+  "experiment_id": "exp-20260714-resume-fixture",
+  "hypothesis_id": "H-RESUME-001",
+  "profile": "STANDARD",
+  "stage": "ANALYSIS",
+  "status": "RUNNING",
+  "parent_experiment_id": null,
+  "gates": {
+    "novelty": {
+      "verdict": "NOT_APPLICABLE",
+      "artifact": null,
+      "rationale": "STANDARD internal comparison; no novelty claim",
+      "acceptance": null
+    },
+    "feasibility": {
+      "verdict": "PASS",
+      "artifact": "FEASIBILITY.md",
+      "rationale": null,
+      "acceptance": null
+    },
+    "protocol": {
+      "verdict": "PASS",
+      "artifact": "PROTOCOL.md",
+      "rationale": null,
+      "acceptance": null
+    },
+    "pilot": {
+      "verdict": "PASS",
+      "artifact": "PILOT.md",
+      "rationale": null,
+      "acceptance": null
+    },
+    "review": {
+      "verdict": "PASS",
+      "artifact": "REVIEW.md",
+      "rationale": null,
+      "acceptance": null
+    }
+  },
+  "artifacts": {
+    "summary": "results/summary.json",
+    "analysis": "analysis.md",
+    "decision": "DECISION.md",
+    "debug": "DEBUG.md",
+    "ablation": "ABLATION_PLAN.md"
+  },
+  "warnings": []
+}

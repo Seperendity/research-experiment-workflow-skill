@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "skill_name": "research-experiment-workflow",
+  "runner_contract": {
+    "surface": "native_skill_catalog",
+    "prompt_wrapper": null,
+    "samples_per_case": 3,
+    "fresh_session_per_sample": true,
+    "scoring_signal": "runtime_skill_activation_trace"
+  },
+  "cases": [
+    {
+      "id": "explicit_named_skill",
+      "category": "explicit_skill",
+      "prompt": "Use $research-experiment-workflow to create the next valid artifact for this bounded comparison.",
+      "should_invoke": true,
+      "rationale": "The user explicitly names the skill."
+    },
+    {
+      "id": "explicit_protocol_artifact",
+      "category": "durable_artifact",
+      "prompt": "Create and lock PROTOCOL.md for this comparison, including the evaluation boundary and decision rule.",
+      "should_invoke": true,
+      "rationale": "The user explicitly requests a durable experiment artifact and evidence boundary."
+    },
+    {
+      "id": "explicit_resume_manifest",
+      "category": "durable_artifact",
+      "prompt": "Resume the experiment from its existing experiment.json and produce the next evidence-backed artifact.",
+      "should_invoke": true,
+      "rationale": "The user explicitly requests resuming durable experiment state."
+    },
+    {
+      "id": "explicit_analyze_saved_evidence",
+      "category": "durable_artifact",
+      "prompt": "Analyze the reviewed results/summary.json and write the evidence-grounded analysis.md for this experiment.",
+      "should_invoke": true,
+      "rationale": "The user explicitly requests analysis grounded in saved experiment artifacts."
+    },
+    {
+      "id": "implicit_experiment_design",
+      "category": "implicit_design",
+      "prompt": "Help me design an experiment comparing two retrieval methods.",
+      "should_invoke": false,
+      "rationale": "Discussion and design alone do not request the skill or durable artifacts."
+    },
+    {
+      "id": "implicit_experiment_brainstorm",
+      "category": "implicit_design",
+      "prompt": "What are some good ways to test whether this model is robust?",
+      "should_invoke": false,
+      "rationale": "Open-ended experiment brainstorming should remain ordinary assistance."
+    },
+    {
+      "id": "ordinary_debugging",
+      "category": "ordinary_task",
+      "prompt": "Fix this failing parser unit test and explain the bug.",
+      "should_invoke": false,
+      "rationale": "Ordinary code debugging is outside the skill."
+    },
+    {
+      "id": "generic_results_discussion",
+      "category": "ordinary_task",
+      "prompt": "Explain what a two-point improvement in this chart might mean.",
+      "should_invoke": false,
+      "rationale": "Generic discussion without experiment artifacts or an evidence-chain request stays ordinary."
+    }
+  ]
+}
