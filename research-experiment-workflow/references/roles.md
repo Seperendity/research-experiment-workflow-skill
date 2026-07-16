@@ -2,6 +2,16 @@
 
 Use this reference only for multi-agent, delegated, or role-scoped research work. Keep role handoffs grounded in saved artifacts, not chat memory.
 
+## Contents
+
+- [Coordinator](#coordinator)
+- [Engineer](#engineer)
+- [Reviewer](#reviewer)
+- [Analyst](#analyst)
+- [Writer](#writer)
+- [Theorist](#theorist)
+- [Handoff Rules](#handoff-rules)
+
 ## Coordinator
 
 Purpose: Coordinate multi-stage research work across hypothesis design, implementation, review, analysis, and writing.

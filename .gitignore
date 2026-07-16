@@ -11,7 +11,5 @@ __pycache__/
 # Codex/runtime scratch
 .codex/tmp/
 
-# Evaluation runtime logs and duplicate per-attempt output
-evaluations/**/results/logs/
-evaluations/**/results/forward_outputs/
-evaluations/**/results/*run-results.json
+# Local evaluation artifacts
+/evaluations/
