@@ -60,9 +60,9 @@ Required outputs:
 
 - Code or config changes when needed.
 - Config or command snapshot.
-- `PILOT.md` for pilot work.
-- `run_notes.md` and `results/summary.json` for completed runs.
-- Experiment README updates when scope or status changes.
+- `EXPERIMENT.md` for compact `LITE` work, or dedicated `PILOT.md` and `run_notes.md` for expanded packages.
+- `results/summary.json` for completed runs.
+- Experiment README updates for expanded packages when scope or status changes.
 
 ## Reviewer
 
@@ -87,7 +87,7 @@ Out of scope:
 
 Required outputs:
 
-- `REVIEW.md`.
+- The `EXPERIMENT.md` review section for `LITE`, or `REVIEW.md` for expanded packages.
 - Prioritized findings with severity and blocking status.
 - Explicit sign-off state, independence status, and required follow-ups.
 
@@ -112,7 +112,7 @@ Out of scope:
 
 Required outputs:
 
-- `analysis.md`.
+- The `EXPERIMENT.md` analysis section for `LITE`, or `analysis.md` for expanded packages.
 - Tables, figure references, or plot inputs as needed.
 - Supported, unsupported, and inconclusive claim summary.
 - Evidence-backed input for `DECISION.md`.

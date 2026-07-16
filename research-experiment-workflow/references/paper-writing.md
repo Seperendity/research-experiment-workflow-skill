@@ -76,7 +76,6 @@ Load only the needed section file:
 - Conclusion: `references/paper-writing-conclusion.md`
 - Paper review (Paper Review): `references/paper-writing-review.md`
 - Paragraph clarity source: `references/paper-writing-flow.md`
-- Example bank index: `references/paper-writing-examples-index.md`
 
 ## Paper Review Core Points
 

@@ -9,6 +9,10 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = Path(__file__).with_name("skill_behavior_cases.json")
+SKILL_PATH = REPO_ROOT / "research-experiment-workflow" / "SKILL.md"
+OPENAI_YAML_PATH = (
+    REPO_ROOT / "research-experiment-workflow" / "agents" / "openai.yaml"
+)
 VALIDATOR_PATH = (
     REPO_ROOT
     / "research-experiment-workflow"
@@ -72,6 +76,15 @@ class SkillBehaviorCasesTests(unittest.TestCase):
                 else:
                     self.assertIsNone(case["expected_profile"])
                     self.assertEqual([], case["required_outcomes"])
+
+    def test_skill_requires_explicit_invocation(self) -> None:
+        skill_text = SKILL_PATH.read_text(encoding="utf-8")
+        frontmatter = skill_text.split("---", 2)[1]
+        openai_yaml = OPENAI_YAML_PATH.read_text(encoding="utf-8")
+
+        self.assertIn("explicitly invokes `$research-experiment-workflow`", frontmatter)
+        self.assertIn("never invoke it implicitly", frontmatter)
+        self.assertIn("allow_implicit_invocation: false", openai_yaml)
 
     def test_resume_fixture_passes_strict_validation(self) -> None:
         resume_case = next(

@@ -52,9 +52,11 @@ research/
   templates/
 ```
 
+This is the expanded `STANDARD`/`PAPER` layout. For `LITE`, use the compact package below instead of precreating empty files.
+
 ## Project Interface Contract
 
-Each project should define these in `AGENTS.md`, a local playbook, or the experiment README:
+Each project should define these in `AGENTS.md`, a local playbook, or the experiment overview artifact:
 
 - Main experiment command or entrypoint.
 - Baseline command, expected baseline artifacts, and whether baseline must be rerun on the current machine.
@@ -99,6 +101,8 @@ Choose the least burdensome profile that can support the intended claim. Default
 | Decision | `DECISION.md` | Exactly one next action is selected and linked |
 | Writing | Draft under `research/papers/drafts/` | Claims cite artifacts or literature |
 
+The dedicated protocol, pilot, run-note, and analysis filenames are expanded-package defaults. A `LITE` manifest may point those gates and artifacts to named sections in one `EXPERIMENT.md`.
+
 ## Gate Semantics
 
 Use `PASS | WARNING | FAIL | PENDING | NOT_APPLICABLE` as the normalized gate vocabulary in schema version 3.
@@ -130,13 +134,12 @@ Apply these rules:
 
 Each new experiment must use `experiment.json` as its control-plane record. Keep artifact volume proportional:
 
-- Every result-bearing profile: `experiment.json`, `README.md`, config or command snapshot, `run_notes.md`, `results/summary.json`, `analysis.md`, and `DECISION.md`.
-- `LITE`: add `PROTOCOL.md` and `PILOT.md`; add feasibility or review artifacts only when those checks are used.
-- `STANDARD`: add `FEASIBILITY.md`, `PROTOCOL.md`, `PILOT.md`, and `REVIEW.md`.
+- `LITE`: create only artifacts reached by the current stage. A completed result-bearing package contains `experiment.json`, `EXPERIMENT.md`, `results/summary.json`, and `DECISION.md`. Put protocol, pilot, run notes, and analysis in named sections of `EXPERIMENT.md`; optional feasibility or review checks may use sections in the same file. Do not create empty future-stage files.
+- `STANDARD`: use `experiment.json`, `README.md`, a config or command snapshot, `run_notes.md`, `results/summary.json`, `analysis.md`, `DECISION.md`, `FEASIBILITY.md`, `PROTOCOL.md`, `PILOT.md`, and `REVIEW.md`.
 - `PAPER`: use the `STANDARD` package plus `NOVELTY.md` or a linked literature note and all evidence needed for paper claims.
 - `LEGACY_AUDIT`: do not create fictional historical artifacts. Preserve the source package and add only the requested review, analysis, or decision artifacts with explicit limitations.
 
-Add `DEBUG.md` after a failed or interrupted run. Add `ABLATION_PLAN.md` before an ablation suite. Existing experiments without `experiment.json` remain readable legacy experiments; validators should warn rather than fail unless strict mode is requested.
+For `LITE`, append debug or ablation material to `EXPERIMENT.md` and point the corresponding manifest artifact to that file. For expanded packages, add `DEBUG.md` after a failed or interrupted run and `ABLATION_PLAN.md` before an ablation suite. Existing experiments without `experiment.json` remain readable legacy experiments; validators should warn rather than fail unless strict mode is requested.
 
 ## Experiment State Version 3
 
@@ -193,6 +196,7 @@ State semantics:
 - Keep every artifact path relative to the experiment directory.
 - Treat an artifact as valid only when it exists, parses when structured, is referenced by the manifest, and has no failed or unaccepted required upstream gate.
 - When a material protocol or implementation change makes downstream evidence stale, set the experiment to `INVALIDATED` or reset the affected gates to `PENDING` before continuing.
+- A `LITE` manifest may reuse `EXPERIMENT.md` for protocol and pilot gates and for analysis, debug, or ablation artifacts only when the corresponding named sections exist.
 
 Schema version 2 manifests remain readable in compatibility mode. New or migrated experiments should use version 3; strict mode rejects compatibility warnings. The result summary schema remains version 2.
 
@@ -248,7 +252,7 @@ Use the following minimum structure for new experiments:
 }
 ```
 
-Use `runs` for repeated executions, folds, groups, or other project-defined units; keep their domain-specific fields inside each run or its artifacts. Keep aggregation methods project-defined and record them in the protocol. Use `target` or `none` when the decision rule is not monotonic and define the exact rule in `PROTOCOL.md`. The summary `hypothesis_id` may be `null` only when a version 3 `LITE` or `LEGACY_AUDIT` manifest also records it as `null`. Use other `null` values only when a field is not applicable or unavailable and explain the reason in `warnings`.
+Use `runs` for repeated executions, folds, groups, or other project-defined units; keep their domain-specific fields inside each run or its artifacts. Keep aggregation methods project-defined and record them in the protocol. Use `target` or `none` when the decision rule is not monotonic and define the exact rule in the locked protocol section (`EXPERIMENT.md` for compact `LITE`, `PROTOCOL.md` otherwise). The summary `hypothesis_id` may be `null` only when a version 3 `LITE` or `LEGACY_AUDIT` manifest also records it as `null`. Use other `null` values only when a field is not applicable or unavailable and explain the reason in `warnings`.
 
 Legacy summaries without `schema_version` remain valid in compatibility mode when they contain the previous top-level `seed` and `metrics` fields. Treat them as warnings so existing projects can migrate incrementally. In strict mode, require version 2.
 
@@ -288,13 +292,56 @@ Legacy summaries without `schema_version` remain valid in compatibility mode whe
 - **Linked experiments**: <experiment IDs or TODO>
 ```
 
-### Experiment README
+### Compact LITE Experiment
+
+Use one `EXPERIMENT.md` for the sections reached so far. Do not add placeholder sections for future stages.
+
+```markdown
+# exp-YYYYMMDD-<name>
+
+- **Profile**: LITE
+- **Status**: PLANNED | RUNNING | INTERRUPTED | BLOCKED | DONE | FAILED | PARTIAL | INVALIDATED
+- **Claim boundary**: <bounded engineering or exploratory claim>
+- **Change**: <what differs from the baseline or current behavior>
+- **Baseline or control**: <artifact, command, or not-applicable reason>
+
+## Protocol
+
+- **Status**: DRAFT | LOCKED | INVALIDATED
+- **Question and primary metric**: <question, metric, and direction>
+- **Evaluation boundary**: <data, inputs, and protected evaluation rules>
+- **Run plan and budget**: <runs, timeout, retries>
+- **Decision rule**: <success, failure, or inconclusive rule>
+- **Allowed changes**: <what may change and what stays fixed>
+
+## Pilot
+
+- **Status**: PASS | FAIL
+- **Command or config**: <smallest meaningful execution>
+- **Checks**: <build, interface, metric health, and artifact checks>
+- **Warnings**: <none or list>
+
+## Run Notes
+
+- **Run, seed, and command/config**: <compact record>
+- **Result artifact**: results/summary.json
+- **Deviations or retries**: <none or explanation>
+
+## Analysis
+
+- **Result**: <primary result and uncertainty>
+- **Supported claim**: <claim or none>
+- **Unsupported or inconclusive claim**: <claim or none>
+- **Limitations**: <scope, missing evidence, or deviations>
+```
+
+### Experiment README (Expanded Package)
 
 ```markdown
 # exp-YYYYMMDD-<name>
 
 - **Hypothesis**: H-XXX
-- **Profile**: LITE | STANDARD | PAPER | LEGACY_AUDIT
+- **Profile**: STANDARD | PAPER
 - **Intended claim scope**: <engineering check, internal result, reproducibility, or paper claim>
 - **Change**: <what differs from baseline>
 - **Config base**: <base config or protocol>
@@ -450,7 +497,7 @@ Keep this artifact concise. Add domain-specific audit items only in the downstre
 # Ablation Plan: <experiment-id>
 
 - **Reference condition**: <artifact or config>
-- **Shared protocol**: PROTOCOL.md
+- **Shared protocol**: <EXPERIMENT.md or PROTOCOL.md>
 - **Primary metric**: <metric>
 - **Budget**: <runs, timeout, retries>
 
@@ -590,7 +637,7 @@ Declare an interaction study explicitly when a row changes more than one factor.
 
 Before presenting paper text as final or paper-ready, verify:
 
-- Every number appears in `results/summary.json`, `analysis.md`, a table, or a cited artifact.
+- Every number appears in `results/summary.json`, the experiment's analysis artifact, a table, or a cited artifact.
 - Every figure and table reference points to an existing file or generated output.
 - Every citation key or reference is present in the bibliography or literature note.
 - Every major Abstract or Introduction claim appears in the claim-evidence map.

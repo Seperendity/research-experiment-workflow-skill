@@ -1,6 +1,6 @@
 ---
 name: research-experiment-workflow
-description: Artifact-gated workflow for decision- or publication-bearing research, machine-learning, and paper experiments. Use only when Codex is explicitly asked to use this skill or to create, update, validate, analyze, or resume durable experiment artifacts and their evidence chain. Do not invoke merely because the user asks to discuss, brainstorm, or design an experiment. Do not use for ordinary code debugging, unit tests, generic analysis, or writing that does not depend on experiment artifacts.
+description: Artifact-gated workflow for creating, resuming, validating, reviewing, and writing from durable research experiment artifacts. Use only when the user explicitly invokes `$research-experiment-workflow`; never invoke it implicitly.
 ---
 
 # Research Experiment Workflow
@@ -29,6 +29,8 @@ Produce the smallest durable research artifact that moves the requested work to 
 
 Upgrade the profile before expanding claim scope. Use `LEGACY_AUDIT` only for existing historical evidence, not as a profile for new empirical work.
 
+For a completed result-bearing `LITE` run, keep only `experiment.json`, one `EXPERIMENT.md` containing protocol, pilot, run notes, and analysis, `results/summary.json`, and `DECISION.md`. Split those sections into separate files only when the user asks or project risk requires it.
+
 ## Task Router
 
 | Requested outcome | Primary artifact or action |
@@ -49,6 +51,8 @@ Upgrade the profile before expanding claim scope. Use `LEGACY_AUDIT` only for ex
 | Draft or revise paper prose | evidence-grounded section artifact |
 
 Paper story and writing are consumers of experiment evidence, not values of `experiment.json.stage`. A provisional story may be planned before experiments finish when planned evidence and open gaps are labeled. Quantitative, comparative, novelty, and causal conclusions require the review demanded by the selected profile.
+
+For `LITE`, route protocol, pilot, run-note, and analysis work to the matching sections of `EXPERIMENT.md`; the dedicated filenames above are the `STANDARD` and `PAPER` defaults.
 
 ## Core Contract
 

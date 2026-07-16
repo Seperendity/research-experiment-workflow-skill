@@ -40,11 +40,13 @@
       "required_outcomes": [
         "select LITE",
         "lock a decision rule and evaluation boundary",
-        "plan the smallest meaningful pilot"
+        "plan the smallest meaningful pilot",
+        "use EXPERIMENT.md for protocol, pilot, run notes, and analysis"
       ],
       "forbidden_behaviors": [
         "claim novelty",
-        "create paper-strength review requirements"
+        "create paper-strength review requirements",
+        "create separate PROTOCOL.md, PILOT.md, run_notes.md, or analysis.md without a user request or risk-based need"
       ]
     },
     {

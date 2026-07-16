@@ -26,10 +26,12 @@ cp -R research-experiment-workflow-skill/research-experiment-workflow \
 Invoke the skill explicitly:
 
 ```text
-Use $research-experiment-workflow to create and lock PROTOCOL.md for this comparison.
+Use $research-experiment-workflow with the LITE profile for this bounded comparison.
 ```
 
-Implicit invocation is disabled. Ordinary experiment discussion, brainstorming, debugging, and generic analysis should use normal Codex behavior unless the user names the skill or requests durable experiment artifacts.
+Implicit invocation is disabled. Requests that do not name `$research-experiment-workflow` use normal Codex behavior, including experiment design, debugging, analysis, and writing.
+
+The skill validates changed experiment artifacts automatically and reports blocking issues; users do not need to run the validator manually.
 
 Common requests:
 
@@ -52,22 +54,17 @@ Use $research-experiment-workflow to draft the Experiments section from reviewed
 
 Use the smallest profile that supports the intended claim. Never downgrade a profile to bypass missing or failed evidence.
 
+A completed result-bearing `LITE` run uses four files: `experiment.json`, `EXPERIMENT.md`, `results/summary.json`, and `DECISION.md`. Do not precreate separate gate, run-note, or analysis files.
+
 ## Evidence Flow
 
 ```text
-hypothesis -> protocol -> pilot -> run -> review -> analysis -> decision
+LITE:     protocol -> pilot -> run -> analysis -> decision
+STANDARD: hypothesis -> feasibility -> protocol -> pilot -> run -> review -> analysis -> decision
+PAPER:    hypothesis -> novelty -> feasibility -> protocol -> pilot -> run -> review -> analysis -> decision
 ```
 
-`STANDARD` adds feasibility and review; `PAPER` also adds novelty. `LITE` omits gates that its claim scope does not require. Writing consumes reviewed evidence; it is not an experiment stage.
-
-## Validate
-
-New manifests use schema version 3. Result summaries use schema version 2.
-
-```bash
-python research-experiment-workflow/scripts/validate_experiment.py path/to/experiment --strict
-python -m unittest discover -s tests -v
-```
+Writing consumes reviewed evidence; it is not an experiment stage.
 
 ## Repository
 
@@ -83,7 +80,7 @@ tests/
 - `SKILL.md` contains routing and the core contract.
 - `references/artifact-contract.md` defines schemas and templates.
 - `references/paper-writing.md` routes section-specific writing guidance.
-- `tests/` contains validator, behavior, trigger, and fixture tests.
+- `tests/` contains validator tests, behavior-case contract checks, and fixtures.
 
 ## Attribution and License
 

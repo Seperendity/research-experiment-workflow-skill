@@ -345,7 +345,19 @@ class ValidateExperimentTests(unittest.TestCase):
         self.assertEqual(0, result.exit_code(strict=False))
         self.assertEqual(1, result.exit_code(strict=True))
 
-    def test_lite_profile_allows_nonessential_gates_and_hypothesis_to_be_na(self) -> None:
+    def test_compact_lite_package_passes_strict_validation(self) -> None:
+        for path in self.experiment_dir.glob("*.md"):
+            if path.name != "DECISION.md":
+                path.unlink()
+        (self.experiment_dir / "EXPERIMENT.md").write_text(
+            "# Compact LITE experiment\n\n"
+            "## Protocol\n\nLocked.\n\n"
+            "## Pilot\n\nPassed.\n\n"
+            "## Run Notes\n\nCompleted.\n\n"
+            "## Analysis\n\nBounded result.\n",
+            encoding="utf-8",
+        )
+
         self.manifest["profile"] = "LITE"
         self.manifest["hypothesis_id"] = None
         self.summary["hypothesis_id"] = None
@@ -356,11 +368,33 @@ class ValidateExperimentTests(unittest.TestCase):
                 "rationale": "Outside the bounded engineering claim.",
                 "acceptance": None,
             }
+        for gate_name in ("protocol", "pilot"):
+            self.manifest["gates"][gate_name]["artifact"] = "EXPERIMENT.md"
+        self.manifest["artifacts"] = {
+            "summary": "results/summary.json",
+            "analysis": "EXPERIMENT.md",
+            "decision": "DECISION.md",
+        }
+        self.summary["protocol"] = "EXPERIMENT.md"
 
         result = self._validate()
 
         self.assertEqual([], result.errors)
         self.assertEqual([], result.warnings)
+        self.assertEqual(0, result.exit_code(strict=True))
+        self.assertEqual(
+            {
+                "experiment.json",
+                "EXPERIMENT.md",
+                "results/summary.json",
+                "DECISION.md",
+            },
+            {
+                path.relative_to(self.experiment_dir).as_posix()
+                for path in self.experiment_dir.rglob("*")
+                if path.is_file()
+            },
+        )
 
     def test_standard_profile_allows_novelty_gate_to_be_na(self) -> None:
         self.manifest["profile"] = "STANDARD"

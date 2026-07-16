@@ -91,10 +91,6 @@ Definition:
 
 ### Example of the Three Elements
 
-Local cite:
-
-1. `references/paper-writing-examples-method.md`
-
 ## Method Content Decomposition
 
 ```mermaid
@@ -124,10 +120,6 @@ Sentence skeleton:
 2. `Given [input], we first ... then ... finally ...`
 3. `This produces [output], which is used for ...`
 
-Local cite:
-
-1. `references/paper-writing-examples-method.md`
-
 ## How to Write Module Motivation
 
 `Module motivation is usually problem-driven: because a problem exists, we design xx to solve it.`
@@ -137,10 +129,6 @@ Typical opening sentences:
 1. `A remaining problem/challenge is ...`
 2. `However, we ...`
 3. `Previous methods have difficulty in ...`
-
-Local cite:
-
-1. `references/paper-writing-examples-method.md`
 
 ## How to Check Whether Method is Easy to Understand
 
@@ -172,10 +160,6 @@ Local cite:
 % Section 3.3
 ```
 
-Local cite:
-
-1. `references/paper-writing-examples-method.md`
-
 ## Overview Subsection
 
 `Overview should usually include: setting, core contribution, optional pipeline figure pointer, and a map of what each subsection contains.`
@@ -187,17 +171,9 @@ Writing structure:
 3. If pipeline/framework is novel, point to overview figure.
 4. Tell readers what Section 3.1/3.2/3.3 covers.
 
-Local cite:
-
-1. `references/paper-writing-examples-method.md`
-
 ## Section 3.1 and Other Module Subsections
 
 `Basic subsection logic: (1) motivation of this module, (2) module forward process/module design, (3) technical advantages of this module.`
-
-Local cite:
-
-1. `references/paper-writing-examples-method.md`
 
 ## Module Writing Pattern (Mermaid)
 
@@ -214,12 +190,4 @@ flowchart TB
 
 ## Example Bank
 
-1. `references/paper-writing-examples-method.md`
-2. `references/paper-writing-examples-method.md`
-3. `references/paper-writing-examples-method.md`
-4. `references/paper-writing-examples-method.md`
-5. `references/paper-writing-examples-method.md`
-6. `references/paper-writing-examples-method.md`
-7. `references/paper-writing-examples-method.md`
-8. `references/paper-writing-examples-method.md`
-9. `references/paper-writing-examples-method.md`
+See `references/paper-writing-examples-method.md` for planning, module, and section patterns.

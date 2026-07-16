@@ -57,10 +57,6 @@ Introduce the technical challenge, then use one to two sentences to present the 
 3. The technical term must be easy to understand; readers should not feel a jump.
 4. This ability is very important for writing a good abstract.
 
-Version 1 local cite:
-
-1. `references/paper-writing-examples-abstract.md`
-
 ## Version 2: Challenge -> Insight -> Contribution
 
 Introduce the technical challenge, then use one to two sentences to present the insight for solving the challenge, and then one sentence to present the technical contribution that implements this insight.
@@ -82,10 +78,6 @@ Introduce the technical challenge, then use one to two sentences to present the 
 4. The technical term must be easy to understand; do not create a jump in reading.
 5. This ability is very important for writing a good abstract.
 
-Version 2 local cite:
-
-1. `references/paper-writing-examples-abstract.md`
-
 ## Version 3: Multiple Contributions
 
 Version 3: When there are multiple technical contributions, describe each contribution together with its technical advantage.
@@ -104,16 +96,9 @@ Version 3: When there are multiple technical contributions, describe each contri
 1. When there are multiple technical contributions, describe each contribution together with its technical advantage.
 2. The ability to express "contribution + advantage" in one sentence is very important for writing a good abstract.
 
-Version 3 local cite:
-
-1. `references/paper-writing-examples-abstract.md`
-
 ## Example Bank
 
-1. `references/paper-writing-examples-abstract.md`
-2. `references/paper-writing-examples-abstract.md`
-3. `references/paper-writing-examples-abstract.md`
-4. `references/paper-writing-examples-abstract.md`
+See `references/paper-writing-examples-abstract.md` for all three patterns.
 
 ## Abstract Quality Checklist
 

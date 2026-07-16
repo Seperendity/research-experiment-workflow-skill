@@ -26,10 +26,12 @@ cp -R research-experiment-workflow-skill/research-experiment-workflow \
 显式调用：
 
 ```text
-使用 $research-experiment-workflow，为这个比较创建并锁定 PROTOCOL.md。
+使用 $research-experiment-workflow 的 LITE 配置完成这个有限范围的比较。
 ```
 
-该 skill 默认关闭隐式调用。普通实验讨论、构思、代码调试和通用分析应使用 Codex 的常规行为；只有用户点名该 skill 或明确要求创建持久化实验文件时才调用。
+该 skill 默认关闭隐式调用。未点名 `$research-experiment-workflow` 的请求一律使用 Codex 常规行为，包括实验设计、代码调试、分析和写作。
+
+Skill 会自动校验修改后的实验文件并报告阻塞问题，用户无需手动运行校验器。
 
 常见请求：
 
@@ -52,22 +54,17 @@ cp -R research-experiment-workflow-skill/research-experiment-workflow \
 
 选择能够支撑预期结论的最低配置。不能通过降级绕过缺失或失败的证据。
 
+一个完成结果运行的 `LITE` 实验只使用四个文件：`experiment.json`、`EXPERIMENT.md`、`results/summary.json` 和 `DECISION.md`。不要预先创建独立的阶段门、运行记录或分析文件。
+
 ## 证据流程
 
 ```text
-hypothesis -> protocol -> pilot -> run -> review -> analysis -> decision
+LITE:     protocol -> pilot -> run -> analysis -> decision
+STANDARD: hypothesis -> feasibility -> protocol -> pilot -> run -> review -> analysis -> decision
+PAPER:    hypothesis -> novelty -> feasibility -> protocol -> pilot -> run -> review -> analysis -> decision
 ```
 
-`STANDARD` 增加 feasibility 和 review；`PAPER` 还增加 novelty。`LITE` 省略其结论范围不需要的阶段门。论文写作使用已审查的证据，不属于实验阶段。
-
-## 校验
-
-新实验清单使用 schema version 3；结果摘要使用 schema version 2。
-
-```bash
-python research-experiment-workflow/scripts/validate_experiment.py path/to/experiment --strict
-python -m unittest discover -s tests -v
-```
+论文写作使用已审查的证据，不属于实验阶段。
 
 ## 仓库结构
 
@@ -83,7 +80,7 @@ tests/
 - `SKILL.md` 包含任务路由和核心契约。
 - `references/artifact-contract.md` 定义格式和模板。
 - `references/paper-writing.md` 路由各章节写作指南。
-- `tests/` 包含校验器、行为、触发和测试夹具。
+- `tests/` 包含校验器测试、行为案例契约检查和测试夹具。
 
 ## 归因与许可证
 

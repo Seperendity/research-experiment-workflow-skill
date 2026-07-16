@@ -124,10 +124,6 @@ Sentence skeleton:
 1. `[xxx task] targets at recovering/reconstructing/estimating [xxx output] from [xxx input].`
 2. `[xxx task] has a variety of applications such as [xxx], [xxx], and [xxx].`
 
-Local cite:
-
-1. `references/paper-writing-examples-introduction.md`
-
 ### Version 2
 
 `Version 2: If the task is already familiar to most readers, introduce applications directly.`
@@ -141,10 +137,6 @@ Writing structure:
 Sentence skeleton:
 
 1. `[xxx task] has a variety of applications such as [xxx], [xxx], and [xxx].`
-
-Local cite:
-
-1. `references/paper-writing-examples-introduction.md`
 
 ### Version 3
 
@@ -160,10 +152,6 @@ Sentence skeleton:
 
 1. `[general task] has a variety of applications such as [xxx], [xxx], and [xxx].`
 2. `This paper focuses on the specific setting of recovering/reconstructing/estimating [xxx output] from [xxx input].`
-
-Local cite:
-
-1. `references/paper-writing-examples-introduction.md`
 
 ### Version 4
 
@@ -188,10 +176,6 @@ Expert note:
 2. This style needs the right conditions and is less common.
 3. Typical Version 4 flow: Part 1 (task + application and directly expose challenge via previous methods 1) -> Part 2 (previous methods 2 try to solve it but still fail) -> Part 3 (our method).
 4. More common general flow: Part 1 (task + application) -> Part 2 (previous methods 1 + limitation) -> Part 3 (previous methods 2 + limitation; here the target challenge emerges) -> Part 4 (our method).
-
-Local cite:
-
-1. `references/paper-writing-examples-introduction.md`
 
 ## Part B: Introduce Technical Challenge for Previous Methods (Very Important)
 
@@ -233,10 +217,6 @@ Sentence skeleton:
 3. `Recently, ... methods ... However, they ... because ...`
 4. `To overcome this challenge, ... methods ... However, they ... because ...`
 
-Local cite:
-
-1. `references/paper-writing-examples-introduction.md`
-
 ### Technical-Challenge Version 2 (existing task + our insight seen in traditional methods)
 
 `Version 2: For existing tasks, when our insight has historical roots in traditional methods, use that line as conceptual backing and then show why new methods still fail.`
@@ -256,10 +236,6 @@ Sentence skeleton:
 3. `However, these methods still ... because ...`
 4. `To overcome this challenge, newer methods ... However, they ... because ...`
 
-Local cite:
-
-1. `references/paper-writing-examples-introduction.md`
-
 ### Technical-Challenge Version 3 (novel task, no direct methods)
 
 `Version 3: For novel tasks without direct prior methods, define the challenge directly and decompose it into several concrete challenge points.`
@@ -277,10 +253,6 @@ Sentence skeleton:
 2. `First, ...`
 3. `Second, ...`
 4. `Finally, ...`
-
-Local cite:
-
-1. `references/paper-writing-examples-introduction.md`
 
 ## Part C: Introduce Our Pipeline for Solving the Challenge
 
@@ -320,10 +292,6 @@ Sentence skeleton:
 5. `In contrast to previous methods, ...`
 6. `Another advantage of the proposed method is that ...`
 
-Local cite:
-
-1. `references/paper-writing-examples-introduction.md`
-
 ### Pipeline Version 2
 
 `Version 2: Two contributions, and one teaser figure to present the basic idea.`
@@ -346,10 +314,6 @@ Sentence skeleton:
 6. `However, ...` (remaining challenge)
 7. `Specifically, ...` (contribution 2)
 
-Local cite:
-
-1. `references/paper-writing-examples-introduction.md`
-
 ### Pipeline Version 3
 
 `Version 3: Build on a prior pipeline and introduce one new module, with a teaser figure for the basic idea.`
@@ -370,10 +334,6 @@ Sentence skeleton:
 4. `Considering that ..., we introduce ...`
 5. `In contrast to ..., our module ...`
 
-Local cite:
-
-1. `references/paper-writing-examples-introduction.md`
-
 ### Pipeline Version 4
 
 `Version 4: Contribution comes from one important observation. Introduce key innovation first, then a listener-friendly observation as motivation, then method details, then benefits.`
@@ -392,10 +352,6 @@ Sentence skeleton:
 3. `Considering that ..., we ...`
 4. `This leads to ... and achieves ...`
 
-Local cite:
-
-1. `references/paper-writing-examples-introduction.md`
-
 ### Not Recommended Writing
 
 `Not recommended: If the method is simple, do not hide concrete method design in Introduction and only describe abstract insights to make the work look novel.`
@@ -412,25 +368,9 @@ Why not recommended (writing structure warning):
 2. Introducing many new terms without mechanism-level explanation creates a novelty illusion.
 3. Reviewers may interpret this as shallow or incremental work.
 
-Local cite:
-
-1. `references/paper-writing-examples-introduction.md`
-
 ## Example Bank
 
-1. `references/paper-writing-examples-introduction.md`
-2. `references/paper-writing-examples-introduction.md`
-3. `references/paper-writing-examples-introduction.md`
-4. `references/paper-writing-examples-introduction.md`
-5. `references/paper-writing-examples-introduction.md`
-6. `references/paper-writing-examples-introduction.md`
-7. `references/paper-writing-examples-introduction.md`
-8. `references/paper-writing-examples-introduction.md`
-9. `references/paper-writing-examples-introduction.md`
-10. `references/paper-writing-examples-introduction.md`
-11. `references/paper-writing-examples-introduction.md`
-12. `references/paper-writing-examples-introduction.md`
-13. `references/paper-writing-examples-introduction.md`
+See `references/paper-writing-examples-introduction.md` for task, challenge, and pipeline patterns.
 
 ## Quick Quality Checklist
 
