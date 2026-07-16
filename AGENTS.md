@@ -108,8 +108,8 @@ Do not rewrite public history unless the user explicitly asks for it. If a push 
 
 ## License And Safety
 
-- This repository currently has no open-source license unless a `LICENSE` file is added. Do not imply reuse rights beyond what the repository explicitly grants.
-- The `paper-writing-*` references include adapted MIT-licensed material from `Master-cai/Research-Paper-Writing-Skills`; preserve the included notice and attribution when editing those files.
+- This repository is licensed under the MIT License. Keep `LICENSE` and the license statements in both READMEs accurate.
+- The `paper-writing-*` references include adapted MIT-licensed material from `Master-cai/Research-Paper-Writing-Skills`; preserve the upstream copyright notice and attribution when editing or redistributing those files.
 - Do not commit tokens, private endpoints, local machine paths that expose secrets, unpublished paper data, or private experiment results.
 - Keep examples generic and safe to share publicly.
 
