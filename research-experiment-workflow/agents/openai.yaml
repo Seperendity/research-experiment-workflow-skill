@@ -1,7 +1,7 @@
 interface:
   display_name: "Research Experiment Workflow"
   short_description: "Explicit, evidence-gated research workflows"
-  default_prompt: "Use $research-experiment-workflow to produce the next valid research artifact from the available evidence, enforce the selected rigor profile, and stop at blocked gates."
+  default_prompt: "Use $research-experiment-workflow to infer the appropriate rigor profile and produce the next valid research artifact from the available evidence."
 
 policy:
   allow_implicit_invocation: false

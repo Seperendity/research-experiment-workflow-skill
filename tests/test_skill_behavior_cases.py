@@ -10,6 +10,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = Path(__file__).with_name("skill_behavior_cases.json")
 SKILL_PATH = REPO_ROOT / "research-experiment-workflow" / "SKILL.md"
+README_PATH = REPO_ROOT / "README.md"
+README_ZH_PATH = REPO_ROOT / "README.zh-CN.md"
 OPENAI_YAML_PATH = (
     REPO_ROOT / "research-experiment-workflow" / "agents" / "openai.yaml"
 )
@@ -85,6 +87,38 @@ class SkillBehaviorCasesTests(unittest.TestCase):
         self.assertIn("explicitly invokes `$research-experiment-workflow`", frontmatter)
         self.assertIn("never invoke it implicitly", frontmatter)
         self.assertIn("allow_implicit_invocation: false", openai_yaml)
+
+    def test_skill_infers_profile_without_user_selection(self) -> None:
+        skill_text = SKILL_PATH.read_text(encoding="utf-8")
+        openai_yaml = OPENAI_YAML_PATH.read_text(encoding="utf-8")
+        readme = README_PATH.read_text(encoding="utf-8")
+        readme_zh = README_ZH_PATH.read_text(encoding="utf-8")
+
+        self.assertIn("Infer the smallest profile", skill_text)
+        self.assertIn("do not require the user to name one", skill_text)
+        self.assertIn("proceed without asking the user to choose", skill_text)
+        self.assertIn("infer the appropriate rigor profile", openai_yaml)
+        self.assertIn("you do not need to choose a profile", readme)
+        self.assertIn("无需选择配置", readme_zh)
+        self.assertNotIn("with LITE", readme)
+        self.assertNotIn("的 LITE 配置", readme_zh)
+
+        inferred_case_ids = {
+            "paper_new_direction",
+            "lite_bounded_comparison",
+            "standard_unspecified_empirical",
+            "legacy_evidence_audit",
+        }
+        inferred_cases = {
+            case["id"]: case
+            for case in self.payload["cases"]
+            if case["id"] in inferred_case_ids
+        }
+        self.assertEqual(inferred_case_ids, set(inferred_cases))
+        for case_id, case in inferred_cases.items():
+            with self.subTest(case=case_id):
+                for profile in VALID_PROFILES:
+                    self.assertNotIn(profile, case["prompt"])
 
     def test_resume_fixture_passes_strict_validation(self) -> None:
         resume_case = next(

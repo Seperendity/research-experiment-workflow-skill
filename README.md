@@ -10,7 +10,7 @@ Coding agents can modify code and run experiments, but research can still fail t
 
 ## Design Focus
 
-- **Claim-scaled rigor:** `LITE`, `STANDARD`, `PAPER`, and `LEGACY_AUDIT` match workflow cost to the intended claim.
+- **Automatic rigor selection:** the skill infers `LITE`, `STANDARD`, `PAPER`, or `LEGACY_AUDIT` from the task, intended use, and existing artifacts.
 - **The next valid artifact:** complete the current requested outcome instead of silently running an end-to-end pipeline.
 - **Resumable state:** `experiment.json` records the current stage, status, checks, and artifact paths.
 - **Deterministic validation:** a standard-library validator checks package structure and consistency; it does not judge scientific truth.
@@ -27,11 +27,14 @@ cp -R research-experiment-workflow-skill/research-experiment-workflow \
 
 ## Use
 
-Invoke the skill explicitly:
+Describe the task normally; you do not need to choose a profile:
 
 ```text
-Use $research-experiment-workflow with the LITE profile for this bounded comparison.
+Use $research-experiment-workflow to compare two local training configs.
+Run a small pilot and tell me which one to keep.
 ```
+
+The skill infers the smallest profile that can support the requested outcome and records that choice in the experiment state.
 
 Implicit invocation is disabled. Requests that do not name `$research-experiment-workflow` use normal Codex behavior, including experiment design, debugging, analysis, and writing.
 
@@ -47,7 +50,9 @@ Use $research-experiment-workflow to review results/summary.json and produce the
 Use $research-experiment-workflow to draft the Experiments section from reviewed evidence.
 ```
 
-## Profiles
+## Automatically Selected Profiles
+
+These profiles are internal rigor levels; users do not need to select one before starting.
 
 | Profile | Use | Required gates |
 |---|---|---|
@@ -56,7 +61,7 @@ Use $research-experiment-workflow to draft the Experiments section from reviewed
 | `PAPER` | Publication-facing novelty or scientific claims | Novelty, feasibility, protocol, pilot, review |
 | `LEGACY_AUDIT` | Historical evidence without reconstructable workflow history | Record gaps; no retroactive gates |
 
-Use the smallest profile that supports the intended claim. Never downgrade a profile to bypass missing or failed evidence.
+The skill preserves an existing profile unless the claim expands, and never downgrades one to bypass missing or failed evidence.
 
 A completed result-bearing `LITE` run uses four files: `experiment.json`, `EXPERIMENT.md`, `results/summary.json`, and `DECISION.md`. Do not precreate separate gate, run-note, or analysis files.
 

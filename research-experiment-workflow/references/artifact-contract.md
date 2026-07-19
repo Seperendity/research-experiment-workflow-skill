@@ -61,7 +61,7 @@ Each project should define these in `AGENTS.md`, a local playbook, or the experi
 - Main experiment command or entrypoint.
 - Baseline command, expected baseline artifacts, and whether baseline must be rerun on the current machine.
 - Plot, analysis, or report-generation command.
-- Intended claim scope and workflow profile.
+- Intended claim scope, inferred workflow profile, and selection rationale.
 - Expected result schema, metric names, and artifact paths.
 - Estimand or target quantity, unit of analysis, and primary decision metric.
 - Sample-size or repeat rationale, seed policy, aggregation method, uncertainty method, hardware assumptions, timeout, run budget, and retry budget.
@@ -72,7 +72,7 @@ Each project should define these in `AGENTS.md`, a local playbook, or the experi
 
 ## Workflow Profiles
 
-Choose the least burdensome profile that can support the intended claim. Default new empirical work to `STANDARD`; escalate when claim risk increases and never downgrade to bypass a failed gate.
+Infer the least burdensome profile from the user's intended use of the results and the available artifacts; do not require the user to name one. Preserve an existing manifest profile unless the claim expands. Default new empirical work to `STANDARD`; escalate when claim risk increases and never downgrade to bypass a failed gate.
 
 | Profile | Intended use | Required gate sequence |
 |---|---|---|

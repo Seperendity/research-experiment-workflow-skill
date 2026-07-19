@@ -50,6 +50,22 @@
       ]
     },
     {
+      "id": "standard_unspecified_empirical",
+      "prompt": "Use $research-experiment-workflow to compare a new training method against the current baseline for an internal research decision. Create only the next valid artifacts.",
+      "should_invoke": true,
+      "expected_profile": "STANDARD",
+      "required_outcomes": [
+        "infer STANDARD without asking the user to name a profile",
+        "record a falsifiable hypothesis and feasibility evidence",
+        "stop after the requested next valid artifacts"
+      ],
+      "forbidden_behaviors": [
+        "ask the user to choose a workflow profile",
+        "treat an internal empirical conclusion as a bounded engineering check",
+        "run the full experiment before required gates"
+      ]
+    },
+    {
       "id": "material_protocol_change",
       "prompt": "Use $research-experiment-workflow to change the primary metric after a completed PAPER experiment and determine which artifacts remain valid.",
       "should_invoke": true,

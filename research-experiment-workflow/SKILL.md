@@ -13,7 +13,7 @@ Produce the smallest durable research artifact that moves the requested work to 
 
 1. Inspect only the project files and experiment artifacts needed for the request.
 2. If `experiment.json` exists, resume from its latest valid stage, gates, and artifact paths; do not restart completed work.
-3. Select the smallest profile that supports the intended claim. Never downgrade a profile to bypass missing or failed evidence.
+3. Infer the smallest profile that supports the intended claim; do not require the user to name one. Preserve an existing manifest profile unless the claim expands, and never downgrade to bypass missing or failed evidence.
 4. Identify the current requested outcome, not an automatic end-to-end pipeline.
 5. Load only the references routed below.
 6. After changing a manifest, gate, or result package, run the validator before presenting the stage as complete.
@@ -27,7 +27,7 @@ Produce the smallest durable research artifact that moves the requested work to 
 | `PAPER` | Publication-facing novelty, comparative, causal, or scientific claims | Novelty, feasibility, protocol, pilot, review | Full claim-evidence chain required |
 | `LEGACY_AUDIT` | Compatibility review of historical work whose gates cannot be reconstructed | None; record gaps | Describes available evidence only; never implies retrospective compliance |
 
-Upgrade the profile before expanding claim scope. Use `LEGACY_AUDIT` only for existing historical evidence, not as a profile for new empirical work.
+Infer the profile from the requested use of the results and the available artifacts. Default new empirical work to `STANDARD`; use `LITE` only for bounded non-paper work, `PAPER` for publication-facing claims, and `LEGACY_AUDIT` only for historical evidence whose workflow cannot be reconstructed. Briefly report the selected profile and reason, then proceed without asking the user to choose among profiles. Upgrade before expanding claim scope.
 
 For a completed result-bearing `LITE` run, keep only `experiment.json`, one `EXPERIMENT.md` containing protocol, pilot, run notes, and analysis, `results/summary.json`, and `DECISION.md`. Split those sections into separate files only when the user asks or project risk requires it.
 
