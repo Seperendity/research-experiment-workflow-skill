@@ -10,3 +10,6 @@ __pycache__/
 
 # Codex/runtime scratch
 .codex/tmp/
+
+# Local evaluation artifacts
+/evaluations/

@@ -2,7 +2,7 @@
 
 Source upstream path: `research-paper-writing/references/paper-review.md`.
 
-# Paper Review (Paper Rview)
+# Paper Review
 
 ## Goal
 

@@ -1,178 +1,111 @@
-<p align="right">
-  <a href="./README.zh-CN.md">简体中文</a>
-</p>
+<p align="right"><a href="./README.zh-CN.md">简体中文</a></p>
 
 # Research Experiment Workflow Skill
 
-An artifact-gated Codex skill for research, machine learning, and paper-oriented experiments.
+An artifact-gated Codex skill for reproducible research, machine learning experiments, and evidence-grounded paper writing. It keeps claims traceable to locked protocols, saved results, review, and explicit decisions.
 
-This skill helps Codex act less like an eager code generator and more like a disciplined research operator: ideas are scored, hypotheses are made falsifiable, novelty risk is checked, pilots run before full experiments, reviews happen before claims, and writing is grounded in saved artifacts.
+## Why This Skill
 
-## What It Provides
+Coding agents can modify code and run experiments, but research can still fail through protocol drift, final-test leakage, missing baselines, lost state across sessions, or claims detached from saved results. This skill turns research state and evidence into durable, reviewable files instead of relying on chat history.
 
-- **A staged research workflow**: idea scoring, hypothesis, novelty check, feasibility, pilot, experiment run, review, analysis, and writing.
-- **Durable experiment artifacts**: templates for `ideas.json`, `NOVELTY.md`, `FEASIBILITY.md`, `PILOT.md`, `run_notes.md`, `results/summary.json`, `REVIEW.md`, and `analysis.md`.
-- **Paper-aware guardrails**: baseline checks, novelty risk, leakage checks, metric misuse, post-hoc selection, review rubric, and writing integrity checks.
-- **Complete paper-writing guidance**: reviewer-facing guidance for Abstract, Introduction, Related Work, Method, Experiments, Conclusion, paragraph flow, figure/table presentation, claim-evidence maps, and adversarial self-review.
-- **Cross-project reuse**: project-specific commands and metrics stay in each repo; the reusable skill keeps the process consistent.
+## Design Focus
 
-## Installation
+- **Automatic rigor selection:** the skill infers `LITE`, `STANDARD`, `PAPER`, or `LEGACY_AUDIT` from the task, intended use, and existing artifacts.
+- **The next valid artifact:** complete the current requested outcome instead of silently running an end-to-end pipeline.
+- **Resumable state:** `experiment.json` records the current stage, status, checks, and artifact paths.
+- **Deterministic validation:** a standard-library validator checks package structure and consistency; it does not judge scientific truth.
+- **Evidence-grounded writing:** quantitative and comparative claims must trace to saved and reviewed evidence.
+
+## Install
 
 ```bash
 git clone https://github.com/Seperendity/research-experiment-workflow-skill.git
 mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R research-experiment-workflow-skill/research-experiment-workflow "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R research-experiment-workflow-skill/research-experiment-workflow \
+  "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
-Then invoke it from any Codex session:
+## Use
+
+Describe the task normally; you do not need to choose a profile:
 
 ```text
-Use $research-experiment-workflow to turn this research idea into a hypothesis, novelty check, feasibility report, and pilot plan.
+Use $research-experiment-workflow to compare two local training configs.
+Run a small pilot and tell me which one to keep.
 ```
 
-## Workflow
+The skill infers the smallest profile that can support the requested outcome and records that choice in the experiment state.
+
+Implicit invocation is disabled. Requests that do not name `$research-experiment-workflow` use normal Codex behavior, including experiment design, debugging, analysis, and writing.
+
+The skill validates changed experiment artifacts automatically and reports blocking issues; users do not need to run the validator manually.
+
+Common requests:
 
 ```text
-idea scoring
-  -> hypothesis
-  -> novelty check
-  -> feasibility
-  -> pilot
-  -> experiment run
-  -> review
-  -> analysis
-  -> writing
+Use $research-experiment-workflow to resume the experiment from experiment.json.
+
+Use $research-experiment-workflow to review results/summary.json and produce the next decision.
+
+Use $research-experiment-workflow to draft the Experiments section from reviewed evidence.
 ```
 
-Use the whole pipeline for new research directions. For ongoing projects, resume from the latest valid artifact instead of restarting.
+## Automatically Selected Profiles
 
-## Repository Layout
+These profiles are internal rigor levels; users do not need to select one before starting.
+
+| Profile | Use | Required gates |
+|---|---|---|
+| `LITE` | Bounded engineering evidence or exploratory pilots | Protocol, pilot |
+| `STANDARD` | Internal empirical conclusions and reproducibility | Feasibility, protocol, pilot, review |
+| `PAPER` | Publication-facing novelty or scientific claims | Novelty, feasibility, protocol, pilot, review |
+| `LEGACY_AUDIT` | Historical evidence without reconstructable workflow history | Record gaps; no retroactive gates |
+
+The skill preserves an existing profile unless the claim expands, and never downgrades one to bypass missing or failed evidence.
+
+A completed result-bearing `LITE` run uses four files: `experiment.json`, `EXPERIMENT.md`, `results/summary.json`, and `DECISION.md`. Do not precreate separate gate, run-note, or analysis files.
+
+## Evidence Flow
+
+```text
+LITE:     protocol -> pilot -> run -> analysis -> decision
+STANDARD: hypothesis -> feasibility -> protocol -> pilot -> run -> review -> analysis -> decision
+PAPER:    hypothesis -> novelty -> feasibility -> protocol -> pilot -> run -> review -> analysis -> decision
+```
+
+Writing consumes reviewed evidence; it is not an experiment stage.
+
+## Positioning
+
+This repository is a compact evidence-control layer for existing research projects:
+
+| Compared with | Focus here |
+|---|---|
+| End-to-end autonomous-scientist systems | Human-supervised progress that stops at the requested outcome or a blocked check |
+| Autonomous optimization loops | General experiment state, baselines, uncertainty, invalidation, and claim boundaries rather than one fixed metric loop |
+| Broad academic skill suites | A smaller contract focused on the experiment lifecycle, with progressive disclosure |
+| Writing-only skills | Paper prose consumes saved experiment evidence instead of standing apart from it |
+
+The skill does not replace experiment code, schedulers, literature databases, or scientific judgment. It adds a lightweight, auditable workflow to a project's existing tools and conventions.
+
+## Repository
 
 ```text
 research-experiment-workflow/
   SKILL.md
-  agents/
-    openai.yaml
+  agents/openai.yaml
+  scripts/validate_experiment.py
   references/
-    artifact-contract.md
-    roles.md
-    paper-writing.md
-    paper-writing-*.md
+tests/
 ```
 
-- `SKILL.md` defines the stage router, gates, role discipline, and operating principles.
-- `references/artifact-contract.md` defines the artifact schema, compact templates, review rubric, and writing checks.
-- `references/paper-writing.md` routes paper drafting, section revision, paragraph-flow checks, figure/table presentation, claim-evidence mapping, and paper self-review.
-- `references/paper-writing-*.md` contains section-specific writing guides and flattened example banks adapted from `Master-cai/Research-Paper-Writing-Skills`.
-- `agents/openai.yaml` provides Codex UI metadata and a default prompt.
+- `SKILL.md` contains routing and the core contract.
+- `references/artifact-contract.md` defines schemas and templates.
+- `references/paper-writing.md` routes section-specific writing guidance.
+- `tests/` contains validator tests, behavior-case contract checks, and fixtures.
 
-## Example: Starting A New Experiment Project
+## License and Attribution
 
-Suppose you start a project called `personal-knowledge-os` and want to test:
+This repository is licensed under the [MIT License](LICENSE).
 
-> Does hybrid retrieval, BM25 plus embedding rerank, retrieve relevant personal notes better than pure embedding retrieval for personal knowledge-base QA?
-
-Start with process, not code:
-
-```text
-Use $research-experiment-workflow to set up the experiment workflow for this new project.
-
-Project goal: build a personal knowledge-base QA system.
-Research idea: test whether hybrid retrieval (BM25 + embedding rerank) retrieves relevant notes better than pure embedding retrieval.
-Do not write code yet. Start with idea scoring, hypothesis, novelty check, and feasibility.
-```
-
-The first pass should create or propose artifacts like:
-
-```text
-research/
-  ideas.json
-  hypotheses/
-    tracker.md
-  experiments/
-    exp-20260701-hybrid-retrieval/
-      README.md
-      NOVELTY.md
-      FEASIBILITY.md
-```
-
-Next, give the skill the project interface:
-
-```text
-Use $research-experiment-workflow to add a minimal project interface contract.
-
-Available commands:
-- Retrieval evaluation: python scripts/eval_retrieval.py
-- Dataset: data/eval_queries.jsonl
-- Output: outputs/retrieval_metrics.json
-- Baseline: pure_embedding
-- Metrics: recall@5, recall@10, MRR, latency_ms
-```
-
-Then run a pilot before scaling:
-
-```text
-Use $research-experiment-workflow to design and execute the smallest pilot from the current FEASIBILITY.md.
-
-Requirements:
-- Use only 20 eval queries
-- Compare only pure_embedding and hybrid_retrieval
-- Save PILOT.md and run_notes.md
-- Do not proceed to the full experiment until the pilot passes
-```
-
-If the pilot passes, move to the full experiment:
-
-```text
-Use $research-experiment-workflow. The pilot passed. Execute the full experiment.
-
-Requirements:
-- Use the complete eval_queries.jsonl
-- Fix the seed
-- Compare pure_embedding, hybrid_retrieval, and hybrid_with_rerank
-- Save results/summary.json and run_notes.md
-- Do not write paper conclusions yet. Move to review first.
-```
-
-Finally, keep review, analysis, and writing separate:
-
-```text
-Use $research-experiment-workflow as Reviewer to check whether this experiment is trustworthy.
-Focus on baseline fairness, data leakage, metric validity, cherry-picking, and artifact completeness.
-```
-
-```text
-Use $research-experiment-workflow to write analysis.md from results/summary.json and run_notes.md.
-Only state supported and unsupported claims. Do not draft paper prose yet.
-```
-
-```text
-Use $research-experiment-workflow to draft the experiment section for a paper or technical report from the reviewed analysis.md.
-Every number must cite the experiment id, summary.json, or analysis.md.
-```
-
-For reviewer-facing paper prose, ask for the specific section and keep evidence constraints explicit:
-
-```text
-Use $research-experiment-workflow to draft the Abstract and Introduction from the reviewed analysis.md and NOVELTY.md.
-Use the paper-writing guidance. Include a mini-outline, paragraph roles, claim-evidence map, and open evidence gaps.
-Do not invent numbers, baselines, citations, figures, or conclusions.
-```
-
-## Design Principles
-
-- **Baseline first**: do not claim improvement until a baseline is reproduced or explicitly replaced.
-- **Pilot first**: do not scale a major change until a minimal pilot passes.
-- **Novelty before paper claims**: check close prior work before presenting a contribution.
-- **Evidence over memory**: save artifacts that later stages can inspect.
-- **Writing after review**: paper prose should consume reviewed analysis, not raw logs.
-
-## Inspiration
-
-The skill borrows useful workflow ideas from artifact-driven research practice and AI-Scientist-style systems, including idea scoring, novelty checks, experiment budgets, run notes, review rubrics, and writing integrity checks. Its paper-writing references adapt the MIT-licensed `Master-cai/Research-Paper-Writing-Skills` skill, whose README credits Prof. Peng Sida's open study notes as the primary source of writing methodology. This skill is intentionally a human-controlled workflow gatekeeper, not a fully automated paper generator.
-
-## License
-
-This repository currently has no open-source license. Add a `LICENSE` file before accepting external contributions or granting reuse rights beyond normal public viewing.
-
-The `research-experiment-workflow/references/paper-writing-*` files include adapted material from the MIT-licensed `Master-cai/Research-Paper-Writing-Skills` repository. See `references/paper-writing-attribution.md` for the copied MIT notice and source attribution.
+The `paper-writing-*` references adapt MIT-licensed material from [`Master-cai/Research-Paper-Writing-Skills`](https://github.com/Master-cai/Research-Paper-Writing-Skills). That material remains subject to its upstream copyright and license notice; see [`paper-writing-attribution.md`](research-experiment-workflow/references/paper-writing-attribution.md).

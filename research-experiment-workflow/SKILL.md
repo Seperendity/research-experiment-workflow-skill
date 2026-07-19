@@ -1,136 +1,79 @@
 ---
 name: research-experiment-workflow
-description: Artifact-gated workflow for research, machine learning, and paper-oriented experiments. Use when Codex needs to turn an idea into a scored research direction, check novelty, assess feasibility, run a pilot, execute or debug an experiment, review evidence, analyze results, plan ablations, draft or revise reviewer-facing paper sections, improve paragraph flow, align claims with evidence, polish figures/tables, or run paper self-review with claims traceable to saved artifacts.
+description: Artifact-gated workflow for creating, resuming, validating, reviewing, and writing from durable research experiment artifacts. Use only when the user explicitly invokes `$research-experiment-workflow`; never invoke it implicitly.
 ---
 
 # Research Experiment Workflow
 
-## Overview
+## Goal
 
-Use this skill to keep research work artifact-driven: each stage must leave a durable file that the next stage consumes. Prefer small, falsifiable experiments over broad implementation, and do not turn observations into paper claims until the evidence package has passed the relevant gates.
+Produce the smallest durable research artifact that moves the requested work to its next valid state. Preserve an auditable chain from intended claim and locked protocol to runs, review, analysis, and decision. Let the model choose the efficient path within the contract below.
 
-For exact artifact templates, summary schema, project interface contracts, and writing integrity checks, read `references/artifact-contract.md` when creating or validating experiment artifacts. For paper drafting, revision, paragraph flow, figure/table presentation, and self-review, read `references/paper-writing.md` first, then load only the section-specific writing reference needed for the current target.
+## Start
 
-## First Actions
+1. Inspect only the project files and experiment artifacts needed for the request.
+2. If `experiment.json` exists, resume from its latest valid stage, gates, and artifact paths; do not restart completed work.
+3. Infer the smallest profile that supports the intended claim; do not require the user to name one. Preserve an existing manifest profile unless the claim expands, and never downgrade to bypass missing or failed evidence.
+4. Identify the current requested outcome, not an automatic end-to-end pipeline.
+5. Load only the references routed below.
+6. After changing a manifest, gate, or result package, run the validator before presenting the stage as complete.
 
-1. Load the repository's project instructions if present (`AGENTS.md`, `CLAUDE.md`, `README.md`, or equivalent), then inspect relevant playbooks, templates, experiment directories, and code.
-2. Identify the current stage from the user request and existing artifacts. Resume from the latest valid artifact instead of restarting.
-3. Choose the smallest stage that handles the request. Use the full pipeline only when the user asks for end-to-end research execution.
-4. Enforce gates: advance only when the previous gate passes, or when the user explicitly accepts a recorded warning.
-5. Keep domain-specific details in project files. The reusable workflow is the stage order, artifact contract, and evidence discipline.
-6. If an agent will execute generated or modified code, check the project's sandbox, dependency, network, and budget limits before running it.
+## Profiles
 
-## Stage Router
+| Profile | Use when | Required gates | Claim boundary |
+|---|---|---|---|
+| `LITE` | Bounded engineering evidence, local comparisons, or exploratory pilots | Protocol, pilot | No novelty or paper-strength claim |
+| `STANDARD` | Reusable empirical conclusions or internal research decisions | Feasibility, protocol, pilot, review | Claims stay within the locked evaluation |
+| `PAPER` | Publication-facing novelty, comparative, causal, or scientific claims | Novelty, feasibility, protocol, pilot, review | Full claim-evidence chain required |
+| `LEGACY_AUDIT` | Compatibility review of historical work whose gates cannot be reconstructed | None; record gaps | Describes available evidence only; never implies retrospective compliance |
 
-| User intent | Stage |
+Infer the profile from the requested use of the results and the available artifacts. Default new empirical work to `STANDARD`; use `LITE` only for bounded non-paper work, `PAPER` for publication-facing claims, and `LEGACY_AUDIT` only for historical evidence whose workflow cannot be reconstructed. Briefly report the selected profile and reason, then proceed without asking the user to choose among profiles. Upgrade before expanding claim scope.
+
+For a completed result-bearing `LITE` run, keep only `experiment.json`, one `EXPERIMENT.md` containing protocol, pilot, run notes, and analysis, `results/summary.json`, and `DECISION.md`. Split those sections into separate files only when the user asks or project risk requires it.
+
+## Task Router
+
+| Requested outcome | Primary artifact or action |
 |---|---|
-| Raw idea list, brainstorming, ranking directions | Idea scoring |
-| New intuition, mechanism, or research question | Hypothesis |
-| Prior art, related work, whether the idea is already known | Novelty check |
-| "Is this worth doing?", scope, data availability, compute risk | Feasibility |
-| Small proof, smoke test, minimal run, config sanity check | Pilot |
-| Full run, scaled run, saved metrics, result package | Experiment run |
-| Failure, NaN, shape mismatch, broken pipeline, missing artifact | Debug |
-| Independent check, code review, result validation, paper evidence audit, paper self-review | Review |
-| Metric interpretation, statistics, tables, figures, comparison | Analysis |
-| Paper section, abstract claim, paragraph flow, section rewrite, related result paragraph | Writing |
-| Claim roadmap, figure plan, paper narrative, section outline | Paper story |
-| Controlled comparison, one-factor removal, table row suite | Ablation |
+| Rank research directions | `research/ideas.json` |
+| State or revise a falsifiable claim | hypothesis tracker entry |
+| Check prior work or claim collision | `NOVELTY.md` |
+| Assess data, code, compute, or validity risk | `FEASIBILITY.md` |
+| Lock evaluation and statistical decisions | `PROTOCOL.md` |
+| Validate the smallest meaningful execution path | `PILOT.md` |
+| Run a result-bearing comparison | config snapshot, run notes, `results/summary.json` |
+| Diagnose a failed research run | `DEBUG.md` and affected-artifact status |
+| Audit evidence or protocol adherence | `REVIEW.md` |
+| Interpret saved results | `analysis.md` |
+| Select the immediate next research action | `DECISION.md` |
+| Define a controlled comparison suite | `ABLATION_PLAN.md` |
+| Plan a paper narrative or evidence roadmap | provisional story and claim-evidence gaps |
+| Draft or revise paper prose | evidence-grounded section artifact |
 
-## Canonical Pipeline
+Paper story and writing are consumers of experiment evidence, not values of `experiment.json.stage`. A provisional story may be planned before experiments finish when planned evidence and open gaps are labeled. Quantitative, comparative, novelty, and causal conclusions require the review demanded by the selected profile.
 
-Run the standard loop as:
+For `LITE`, route protocol, pilot, run-note, and analysis work to the matching sections of `EXPERIMENT.md`; the dedicated filenames above are the `STANDARD` and `PAPER` defaults.
 
-`idea scoring -> hypothesis -> novelty check -> feasibility -> pilot -> experiment run -> review -> analysis -> writing`
+## Core Contract
 
-Use `debug` whenever a pilot or run fails. Use `paper story` to organize claims before writing. Use `ablation` only after the reference model or primary condition is defined.
+- Advance a required gate only on `PASS`, or on `WARNING` with complete acceptance metadata from an authorizing human. An agent must not infer or fabricate acceptance.
+- Use `NOT_APPLICABLE` only when the selected profile does not require the gate; record why and never use it to erase missing evidence.
+- Lock the intended claim, target quantity, unit of analysis, baseline or control, protected evaluation boundary, tuning/final-test separation, uncertainty method, failure handling, budget, and decision rule before result-bearing evaluation.
+- Do not use protected final-test observations to tune the method or selection rule. A material change to the claim, data boundary, metric, analysis plan, or selection rule invalidates affected downstream evidence.
+- Do not claim improvement without a reproduced baseline, a justified replacement, or an explicit statement that no baseline applies.
+- Tie every supported claim to saved metrics, statistics, figures, experiment artifacts, or citations. Label missing evidence, protocol deviations, exploratory analyses, and inconclusive results.
+- Run the smallest test that can answer the current question. Do not continue into a more expensive stage after the requested outcome is complete or while a required gate is blocked.
+- Record one immediate action in `DECISION.md`: `REPLICATE`, `ABLATE`, `REVISE`, `SCALE`, `DEBUG`, or `STOP`. Additional ideas may remain as a backlog.
 
-The first two stages are lightweight. Skip `idea scoring` when the user gives a concrete hypothesis. Skip `novelty check` only for engineering-only work, local reproduction, or when the user explicitly accepts the literature risk.
+## Reference Router
 
-## Stage Rules
+- Read `references/artifact-contract.md` when creating or validating manifests, gates, protocols, result summaries, experiment artifacts, analysis, or decisions. Use its exact schemas and compact templates.
+- For paper story, drafting, revision, paragraph flow, figure/table presentation, or paper self-review, read `references/paper-writing.md`, then only the relevant section-specific reference. Preserve planned-versus-observed evidence labels.
+- If the user explicitly requests multi-agent, delegated, or role-scoped work, read `references/roles.md`. A same-context self-review is not independent sign-off.
 
-### Idea Scoring
+## Finish
 
-Turn raw ideas into a small ranked backlog. Record each idea with name, title, proposed experiment, interestingness, feasibility, novelty, expected evidence, and major risks. Be conservative with ratings and avoid overfitting to a single dataset, benchmark, or convenient implementation path.
-
-Gate: one or more ideas are recorded and the chosen idea has a clear reason for selection.
-
-### Hypothesis
-
-Record a falsifiable statement, rationale, test method, expected outcome, alternative interpretations, priority, status, date, and linked experiments. Check whether a similar hypothesis already exists before adding a new one.
-
-Gate: the hypothesis is recorded and has a concrete test path.
-
-### Novelty Check
-
-Search or inspect project literature notes for close prior work, likely baselines, and claim collisions. Record whether the idea is `NOVEL`, `PARTIAL`, `KNOWN`, or `UNCLEAR`, with citations or explicit search limits.
-
-Gate: proceed only if the contribution remains defensible, or if the user explicitly accepts a narrowed claim or reproduction-only framing.
-
-### Feasibility
-
-Assess data availability, dependencies, code path, baseline, compute cost, budget limits, project interface, and scientific validity. Output a verdict: `GO`, `CONDITIONAL-GO`, or `NO-GO`.
-
-Gate: proceed only on `GO` or on `CONDITIONAL-GO` after conditions are resolved or explicitly accepted.
-
-### Pilot
-
-Run the shortest meaningful test that can validate build health, forward shapes, finite loss or metric health, artifact generation, and the specific change being tested.
-
-Gate: mark `PASS` only if the model or pipeline builds, outputs valid shapes or schemas, has no NaN/Inf or empty artifacts, and passes the change-specific sanity check.
-
-### Experiment Run
-
-Run the smallest scale that answers the question. Save config snapshots, metrics, logs, figures or arrays, run notes, and `results/summary.json`. Record budget limits, timeout, retry count, seeds, and stopping conditions.
-
-Gate: training or evaluation completed, artifacts exist, and summary includes baseline comparison or an explicit explanation for why no baseline applies.
-
-### Debug
-
-Reproduce the failure with the smallest meaningful case. Isolate data, model, training loop, config, infrastructure, or artifact-generation causes. Fix and rerun the smallest relevant check, then update the failed pilot or run artifact.
-
-Gate: the failure is explained and either fixed or recorded as a blocker with next action. Stop after the recorded retry or budget limit unless the user extends it.
-
-### Review
-
-Review as an independent reviewer: prioritize correctness, regressions, unsupported claims, missing controls, artifact gaps, reproducibility issues, novelty risk, metric misuse, leakage, and post-hoc selection. For paper-facing review, also read `references/paper-writing-review.md` and check contribution, writing clarity, experimental strength, evaluation completeness, and method design soundness. Report `PASS`, `WARNING`, or `FAIL`, plus conference-style rubric scores when the work is paper-facing.
-
-Gate: blocking issues are fixed before downstream analysis or writing; accepted warnings must be explicitly recorded.
-
-### Analysis
-
-Load saved metrics and compare against baselines or planned controls. Separate supported claims, unsupported claims, inconclusive results, warnings, and next steps. Avoid selecting only favorable runs unless the selection rule was defined before evaluation.
-
-Gate: claims are tied to metrics, figures, statistics, artifacts, or citations.
-
-### Writing
-
-Read `references/paper-writing.md` first, then load only the target section guide: Abstract, Introduction, Related Work, Method, Experiments, Conclusion, paragraph flow, review, or examples as needed. Draft only from confirmed evidence. Every quantitative, comparative, novelty, or causal claim must point to an experiment ID, analysis artifact, figure, table, or citation. Return or save a compact outline, paragraph roles, self-review checklist, and claim-evidence map. Before writing final prose, check that referenced figures, tables, citations, numbers, and section placeholders are present and consistent.
-
-Gate: no invented numbers, unsupported baselines, missing figures, missing citations, unresolved `needs evidence` claims, leftover placeholders, duplicate sections, or unreviewed conclusions.
-
-### Paper Story
-
-Read `references/paper-writing.md` when the story is paper-facing. Define the one-sentence contribution, core claims, planned figures, required validations, section outline, and open evidence gaps. Link each proposed claim to a completed or planned artifact, citation, or explicit future validation. Treat missing evidence as a story gap, not as prose to smooth over.
-
-### Ablation
-
-Define the reference condition first. Each row changes exactly one factor, shares the same evaluation protocol, and is handed to review and analysis before writing conclusions.
-
-## Operating Principles
-
-- Baseline-first: do not claim improvement until the baseline is reproduced, replaced with justification, or explicitly marked unavailable.
-- Novelty-first for paper claims: do not present a contribution until close prior work has been checked or the uncertainty is disclosed.
-- Pilot-first: do not scale a major change until a minimal pilot passes.
-- Budget-first: define timeout, retry count, run count, and stopping conditions before expensive execution.
-- Evidence-first: keep claims traceable to durable artifacts.
-- Compatibility-first: preserve the existing baseline path unless the task explicitly changes it.
-- Artifact-first: prefer updating saved experiment files over relying on chat memory.
-- Smallest-test-first: use the cheapest run that can falsify the current question.
-- Safety-first: execute generated or modified code only inside the project's accepted sandbox and dependency policy.
-
-## Role Discipline
-
-If the user explicitly requests multi-agent, delegated, or role-scoped work, use these roles: Coordinator, Engineer, Reviewer, Analyst, Writer, and optional Theorist. Read `references/roles.md` before assigning or executing role-specific work.
-
-Keep Engineer and Reviewer separate for non-trivial changes; keep Analyst and Writer separate by default when making paper claims. If no delegation is requested, still apply the same role criteria internally: implement as Engineer, then review the diff and evidence as Reviewer before presenting conclusions.
+- Use schema version 3 for new or modified `experiment.json` files; read version 2 only in compatibility mode. `results/summary.json` remains version 2.
+- Run `scripts/validate_experiment.py <experiment-dir> --strict` for current manifests. Use non-strict validation only when auditing legacy artifacts.
+- Report completed artifacts, remaining evidence gaps, accepted warnings, invalidated evidence, and the next recorded action.
+- If required evidence is unavailable, narrow the claim or stop at the blocked gate instead of filling the gap with assumptions.

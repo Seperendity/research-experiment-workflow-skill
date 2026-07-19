@@ -8,8 +8,8 @@ The root documentation is for humans who install or maintain the skill. The `res
 
 - Maintain a compact, reusable skill for artifact-gated research, machine learning, and paper-oriented experiments.
 - Keep the skill generic across projects. Do not hardcode one lab, dataset, framework, model, benchmark, paper, or repository into the skill instructions.
-- Preserve the core workflow: idea scoring, hypothesis, novelty check, feasibility, pilot, experiment run, review, analysis, and writing.
-- Optimize for evidence discipline: durable artifacts, explicit gates, baseline-first comparisons, pilot-first execution, and claims traceable to files.
+- Preserve the core workflow: idea scoring, hypothesis, novelty check, feasibility, protocol lock, pilot, experiment run, review, analysis, decision, and writing.
+- Optimize for evidence discipline: durable artifacts, explicit gates, locked evaluation boundaries, baseline-first comparisons, pilot-first execution, and claims traceable to files.
 
 ## Repository Layout
 
@@ -19,6 +19,8 @@ The root documentation is for humans who install or maintain the skill. The `res
 - `research-experiment-workflow/references/paper-writing.md`: paper-writing router adapted from `Master-cai/Research-Paper-Writing-Skills`.
 - `research-experiment-workflow/references/paper-writing-*.md`: section-specific paper-writing guides, flattened example banks, flow checks, review checklist, and attribution.
 - `research-experiment-workflow/agents/openai.yaml`: UI metadata and default prompt.
+- `research-experiment-workflow/scripts/validate_experiment.py`: read-only compatibility and strict validator for experiment artifacts.
+- `tests/`: standard-library tests for deterministic skill scripts.
 - `README.md`: English public-facing README.
 - `README.zh-CN.md`: Simplified Chinese public-facing README.
 - `AGENTS.md`: repository maintenance instructions for agentic coding tools.
@@ -63,6 +65,8 @@ After any change to the skill package, run:
 
 ```bash
 python /root/.codex/skills/.system/skill-creator/scripts/quick_validate.py research-experiment-workflow
+python -m unittest discover -s tests -v
+python -m py_compile research-experiment-workflow/scripts/validate_experiment.py
 ```
 
 If the system skill validator path is unavailable, run the equivalent validator from the local Codex skill-creator installation and record what was used.
@@ -83,6 +87,7 @@ The secret scan is a lightweight guardrail, not a substitute for judgment.
 - If `SKILL.md` trigger behavior changes, review `agents/openai.yaml` and update the default prompt if stale.
 - If roles change, update `references/roles.md`; keep only a short loading rule in `SKILL.md`.
 - If artifact schemas or templates change, update `references/artifact-contract.md` and consider whether README examples still match.
+- If manifest or summary validation changes, update validator tests and preserve documented legacy compatibility.
 - If paper-writing guidance changes, keep `references/paper-writing-attribution.md` and README attribution accurate.
 - Prefer small, focused commits with clear messages.
 
@@ -91,6 +96,7 @@ The secret scan is a lightweight guardrail, not a substitute for judgment.
 Typical release flow:
 
 ```bash
+python -m unittest discover -s tests -v
 python /root/.codex/skills/.system/skill-creator/scripts/quick_validate.py research-experiment-workflow
 git status --short
 git add <changed-files>
@@ -102,8 +108,8 @@ Do not rewrite public history unless the user explicitly asks for it. If a push 
 
 ## License And Safety
 
-- This repository currently has no open-source license unless a `LICENSE` file is added. Do not imply reuse rights beyond what the repository explicitly grants.
-- The `paper-writing-*` references include adapted MIT-licensed material from `Master-cai/Research-Paper-Writing-Skills`; preserve the included notice and attribution when editing those files.
+- This repository is licensed under the MIT License. Keep `LICENSE` and the license statements in both READMEs accurate.
+- The `paper-writing-*` references include adapted MIT-licensed material from `Master-cai/Research-Paper-Writing-Skills`; preserve the upstream copyright notice and attribution when editing or redistributing those files.
 - Do not commit tokens, private endpoints, local machine paths that expose secrets, unpublished paper data, or private experiment results.
 - Keep examples generic and safe to share publicly.
 
