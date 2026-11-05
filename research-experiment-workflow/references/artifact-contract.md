@@ -256,6 +256,12 @@ Use `runs` for repeated executions, folds, groups, or other project-defined unit
 
 Legacy summaries without `schema_version` remain valid in compatibility mode when they contain the previous top-level `seed` and `metrics` fields. Treat them as warnings so existing projects can migrate incrementally. In strict mode, require version 2.
 
+## Research and Paper Extensions
+
+For candidate lineage, bottleneck evidence, falsification and scientific screening, use `research-design.md`. For cross-experiment claims, version-bound review and paper readiness, use `paper-cycle.md`. These extend project planning without adding writing stages to the experiment manifest. Engineering pilot PASS does not imply scientific support. Record scientific screening in analysis and decision artifacts.
+
+`aggregate.n_completed` counts DONE records in `runs`; run IDs must be unique within a summary. An explicitly INVALIDATED protocol cannot retain a passing gate. The experiment validator checks these deterministic invariants, not scientific validity or all prose/manifest consistency. Use the separate version 1 control contract in `research-control.md` and `validate_paper.py` for paper records, recorded evidence fingerprints, dependencies and readiness. Scientific interpretation still requires review.
+
 ## Compact Templates
 
 ### Ideas

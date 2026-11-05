@@ -10,7 +10,7 @@ Use an adversarial, reviewer-style checklist to detect reject risks early and re
 
 ## Core Principle
 
-Pursue perfectionism in paper quality: assume reviewers will probe every weak point and proactively fix them.
+Prioritize consequential evidence gaps and contribution weaknesses within an explicit review budget.
 
 ## Critical Rule (Do Not Violate)
 
@@ -24,7 +24,7 @@ If a claim is not supported, either add evidence or weaken/remove the claim.
 ## What Usually Gets a Paper Accepted
 
 1. Sufficient contribution (for example: novel task, novel pipeline, novel module, novel design choices, new experimental findings, or new insight).
-2. Better empirical performance than prior methods under fair comparisons.
+2. Evidence appropriate to the contribution: fair empirical improvements, rigorous theory, informative negative results, or validated practical value.
 3. Sufficient comparison experiments and ablation studies.
 
 ## Common Rejection Dimensions
@@ -87,4 +87,4 @@ Use each question to trigger concrete edits before submission.
 2. Answer every question above with explicit evidence from the paper.
 3. Mark each item as `pass`, `needs revision`, or `needs new experiment`.
 4. Revise claims, writing, experiments, or method scope accordingly.
-5. Repeat until no major rejection risk remains.
+5. Repeat within the recorded budget; preserve unresolved risks and narrow unsupported claims. Use paper-cycle.md to track issue closure and supplementary experiments.

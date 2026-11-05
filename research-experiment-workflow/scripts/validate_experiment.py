@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -327,6 +328,19 @@ def _validate_v3_gate(
             require_exists=True,
         )
 
+    if gate_name == "protocol" and verdict in {"PASS", "WARNING"}:
+        raw_path = gate.get("artifact")
+        if isinstance(raw_path, str):
+            path = (root / raw_path).resolve()
+            if root.resolve() in path.parents and path.is_file():
+                try:
+                    body = path.read_text(encoding="utf-8")
+                except (OSError, UnicodeError) as exc:
+                    result.error(f"could not read protocol artifact: {exc}")
+                else:
+                    if re.search(r"(?im)^\s*-?\s*(?:\*\*)?Status(?:\*\*)?\s*:\s*INVALIDATED\s*$", body):
+                        result.error("protocol artifact is INVALIDATED but gate allows progress")
+
     if verdict == "FAIL":
         if status not in {"BLOCKED", "FAILED", "INVALIDATED"}:
             result.error(f"{label} failed but experiment status is {status!r}")
@@ -634,6 +648,12 @@ def _validate_summary(
             if not isinstance(run.get("warnings"), list):
                 result.error(f"{label}.warnings must be a list")
 
+    if isinstance(runs, list):
+        identifiers = [run.get("run_id") for run in runs if isinstance(run, dict)
+                       and isinstance(run.get("run_id"), str)]
+        if len(identifiers) != len(set(identifiers)):
+            result.error("runs contains duplicate run_id values")
+
     aggregate = summary.get("aggregate")
     if isinstance(aggregate, dict):
         _require_keys(
@@ -642,6 +662,11 @@ def _validate_summary(
             result,
             "aggregate",
         )
+        if isinstance(runs, list):
+            actual_completed = sum(isinstance(run, dict) and run.get("status") == "DONE"
+                                   for run in runs)
+            if aggregate.get("n_completed") != actual_completed:
+                result.error("aggregate.n_completed must match DONE run records")
         planned = aggregate.get("n_planned")
         completed = aggregate.get("n_completed")
         if not isinstance(planned, int) or planned < 0:

@@ -20,6 +20,8 @@ The root documentation is for humans who install or maintain the skill. The `res
 - `research-experiment-workflow/references/paper-writing-*.md`: section-specific paper-writing guides, flattened example banks, flow checks, review checklist, and attribution.
 - `research-experiment-workflow/agents/openai.yaml`: UI metadata and default prompt.
 - `research-experiment-workflow/scripts/validate_experiment.py`: read-only compatibility and strict validator for experiment artifacts.
+- `research-experiment-workflow/references/research-control.md`: versioned paper control schema, candidate rounds, and stage evaluation contract.
+- `research-experiment-workflow/scripts/validate_paper.py`: read-only paper evidence, round budget, and readiness validator.
 - `tests/`: standard-library tests for deterministic skill scripts.
 - `README.md`: English public-facing README.
 - `README.zh-CN.md`: Simplified Chinese public-facing README.
@@ -66,7 +68,7 @@ After any change to the skill package, run:
 ```bash
 python /root/.codex/skills/.system/skill-creator/scripts/quick_validate.py research-experiment-workflow
 python -m unittest discover -s tests -v
-python -m py_compile research-experiment-workflow/scripts/validate_experiment.py
+python -m py_compile research-experiment-workflow/scripts/validate_experiment.py research-experiment-workflow/scripts/validate_paper.py
 ```
 
 If the system skill validator path is unavailable, run the equivalent validator from the local Codex skill-creator installation and record what was used.

@@ -109,3 +109,31 @@ tests/
 This repository is licensed under the [MIT License](LICENSE).
 
 The `paper-writing-*` references adapt MIT-licensed material from [`Master-cai/Research-Paper-Writing-Skills`](https://github.com/Master-cai/Research-Paper-Writing-Skills). That material remains subject to its upstream copyright and license notice; see [`paper-writing-attribution.md`](research-experiment-workflow/references/paper-writing-attribution.md).
+
+## Research and Paper Feedback
+
+Paper-oriented work connects problem value, baseline diagnosis, falsifiable candidates, development screening, frozen confirmation, ablation and bounded review. Engineering pilot success and scientific promise are separate decisions. Contributions may include methods, theory, empirical insight, efficiency or applications.
+
+Use an existing project overview or `research/RESEARCH_PLAN.md` for direction and budget. Coordinate cross-experiment claims and review issues in an optional paper-level record; writing remains outside the experiment state machine. Reviews identify checked versions and changes trigger explicit revalidation. The experiment validator checks structural invariants, including unique run IDs and completed counts; it does not certify scientific truth or paper readiness.
+
+## Bounded Research Iterations and Paper Validation
+
+The control contract now records candidate lineage, exploration/refinement choices, trial budgets, and stage evaluations with ACCEPT / REFINE / REJECT / INCONCLUSIVE decisions. When a full iteration is requested, the skill continues through the round decision within the authorized budget. A request for one artifact remains bounded to that artifact.
+
+```text
+Use $research-experiment-workflow to complete one research iteration.
+Use at most two development trials and six stage evaluations.
+Record promotion criteria, preserve failed trials, and finish with the next decision.
+Keep the final test set protected.
+```
+
+For paper coordination, the version 1 `paper.json` schema is defined in `research-experiment-workflow/references/research-control.md`. A read-only validator checks artifact hashes, dependency snapshots, claim/review versions, candidate references, round budgets, issue closure, and READY prerequisites:
+
+```bash
+python <skill-dir>/scripts/validate_paper.py research/papers/<paper-id>/paper.json --project-root .
+python <skill-dir>/scripts/validate_experiment.py research/experiments/<experiment-id> --strict
+```
+
+The skill runs these checks when updating the relevant records. Paper validation does not replace experiment validation, execute experiments, verify external data-manifest contents, or establish scientific truth. GPU/time budgets remain enforced by project execution tools. Tests include synthetic end-to-end validation and failure cases; prompt behavior cases are evaluation specifications, not proof of real agent behavior.
+
+The stage-feedback design draws on [ScientistTwo](https://arxiv.org/abs/2609.19644), while retaining human supervision, protected final evaluation and evidence-based readiness rather than reviewer-score optimization.

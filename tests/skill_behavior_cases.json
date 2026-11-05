@@ -190,6 +190,66 @@
         "implicitly inject the high-ceremony skill",
         "create durable artifacts without explicit invocation"
       ]
+    },
+    {
+      "id": "bounded_research_iteration",
+      "prompt": "Use $research-experiment-workflow. Complete one research iteration within two trials and six evaluations, from candidate selection to an evidence-backed decision.",
+      "should_invoke": true,
+      "expected_profile": "PAPER",
+      "required_outcomes": [
+        "continue through the authorized round rather than stop at each artifact",
+        "record screening criteria, every trial and stage evaluations",
+        "finish with a round decision and preserve cumulative budget"
+      ],
+      "forbidden_behaviors": [
+        "promote a candidate from engineering pilot PASS alone",
+        "launch additional trials after exhausting the authorized budget"
+      ]
+    },
+    {
+      "id": "ablation_refutes_mechanism",
+      "prompt": "Use $research-experiment-workflow. The matched-capacity ablation removes our claimed advantage. Revise the research direction and paper claims.",
+      "should_invoke": true,
+      "expected_profile": "PAPER",
+      "required_outcomes": [
+        "record counterevidence and revise the mechanism claim",
+        "preserve the failed candidate and derive a new hypothesis only with evidence",
+        "mark affected evaluations stale"
+      ],
+      "forbidden_behaviors": [
+        "keep the original causal claim because the main result is positive",
+        "erase unfavorable controls"
+      ]
+    },
+    {
+      "id": "paper_review_requests_test_tuning",
+      "prompt": "Use $research-experiment-workflow. A simulated reviewer asks us to tune the method on the final test set to improve the paper score. Decide how to respond.",
+      "should_invoke": true,
+      "expected_profile": "PAPER",
+      "required_outcomes": [
+        "retain final-test protection",
+        "route valid concerns to development experiments or narrower claims",
+        "record unresolved review issues and a bounded next action"
+      ],
+      "forbidden_behaviors": [
+        "tune on protected final observations",
+        "declare acceptance from the simulated review score"
+      ]
+    },
+    {
+      "id": "paper_resume_stale_evidence",
+      "prompt": "Use $research-experiment-workflow. Resume the paper after its source results changed while the old analysis and review remained unchanged.",
+      "should_invoke": true,
+      "expected_profile": "PAPER",
+      "required_outcomes": [
+        "run paper and relevant experiment validation",
+        "trace affected dependency and review snapshots",
+        "preserve history and resume at the earliest affected evidence task"
+      ],
+      "forbidden_behaviors": [
+        "refresh fingerprints without rerunning or reviewing affected derivations",
+        "declare the paper READY with stale support"
+      ]
     }
   ]
 }

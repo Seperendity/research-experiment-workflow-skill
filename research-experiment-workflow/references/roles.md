@@ -176,3 +176,9 @@ Required outputs:
 - Analyst to Coordinator: provide a recommended decision and the evidence supporting it.
 
 Do not let a handoff rely only on chat memory. If the receiving role needs a fact, save it in an artifact or cite the existing file that contains it.
+
+## Research feedback responsibilities
+
+Use research-design.md for candidate evolution and paper-cycle.md for paper coordination. Coordinator tracks candidate lineage, budget and review issues; Theorist defines discriminating predictions; Engineer separates engineering pilot from scientific screening; Analyst records support and counterevidence; Reviewer binds integrity and claim-support reviews to checked versions; Writer maintains claim alignment. Method-changing review feedback returns to development and affected reviews become stale.
+
+For bounded rounds, Coordinator applies research-control.md, tracks cumulative trial/evaluation budgets, and finishes the authorized round through its decision. Reviewer records the common stage evaluation with input and claim snapshots; distinguish detailed peer-review issues from strategic meta-review. Engineer saves every trial including failures; Analyst links discriminating evidence to candidate evolution. Archive superseded evaluations and re-check affected dependencies before readiness.

@@ -14,7 +14,7 @@ Produce the smallest durable research artifact that moves the requested work to 
 1. Inspect only the project files and experiment artifacts needed for the request.
 2. If `experiment.json` exists, resume from its latest valid stage, gates, and artifact paths; do not restart completed work.
 3. Infer the smallest profile that supports the intended claim; do not require the user to name one. Preserve an existing manifest profile unless the claim expands, and never downgrade to bypass missing or failed evidence.
-4. Identify the current requested outcome, not an automatic end-to-end pipeline.
+4. Identify the requested outcome: one artifact, one bounded research iteration, or a paper milestone. Complete an authorized iteration through its decision; do not stop at each file. Do not expand a bounded request into an end-to-end pipeline.
 5. Load only the references routed below.
 6. After changing a manifest, gate, or result package, run the validator before presenting the stage as complete.
 
@@ -35,6 +35,8 @@ For a completed result-bearing `LITE` run, keep only `experiment.json`, one `EXP
 
 | Requested outcome | Primary artifact or action |
 |---|---|
+| Complete a bounded candidate round | paper control record, stage evaluations, experiment packages, round decision |
+| Check cross-experiment evidence or paper readiness | `paper.json` and paper validator |
 | Rank research directions | `research/ideas.json` |
 | State or revise a falsifiable claim | hypothesis tracker entry |
 | Check prior work or claim collision | `NOVELTY.md` |
@@ -54,6 +56,12 @@ Paper story and writing are consumers of experiment evidence, not values of `exp
 
 For `LITE`, route protocol, pilot, run-note, and analysis work to the matching sections of `EXPERIMENT.md`; the dedicated filenames above are the `STANDARD` and `PAPER` defaults.
 
+## Research and Paper Loops
+
+For paper-oriented research, connect problem value, baseline diagnosis, falsifiable candidates, development screening, frozen confirmation, mechanism/boundary analysis, and paper review. Resume at the evidence-supported point; do not run every phase for a bounded request. Separate engineering pilot success from scientific promise. Preserve learning from failed candidates and use bounded feedback loops.
+
+Keep experiment state in `experiment.json`; coordinate cross-experiment claims and review issues at paper level. Review run integrity before analysis and claim support after analysis. Evidence changes require affected claims and reviews to be rechecked. Human judgment owns contribution significance and submission decisions.
+
 ## Core Contract
 
 - Advance a required gate only on `PASS`, or on `WARNING` with complete acceptance metadata from an authorizing human. An agent must not infer or fabricate acceptance.
@@ -67,6 +75,10 @@ For `LITE`, route protocol, pilot, run-note, and analysis work to the matching s
 
 ## Reference Router
 
+- Read `references/research-control.md` when running candidate rounds, recording stage evaluations, or creating/validating `paper.json`. It owns the exact version 1 control schema and bounded-loop rules.
+- Read `references/research-design.md` for research positioning, candidate evolution, scientific screening, or claim-driven experimental design.
+- Read `references/paper-cycle.md` for cross-experiment evidence, review-driven supplementary experiments, version validity, or paper readiness.
+
 - Read `references/artifact-contract.md` when creating or validating manifests, gates, protocols, result summaries, experiment artifacts, analysis, or decisions. Use its exact schemas and compact templates.
 - For paper story, drafting, revision, paragraph flow, figure/table presentation, or paper self-review, read `references/paper-writing.md`, then only the relevant section-specific reference. Preserve planned-versus-observed evidence labels.
 - If the user explicitly requests multi-agent, delegated, or role-scoped work, read `references/roles.md`. A same-context self-review is not independent sign-off.
@@ -75,5 +87,6 @@ For `LITE`, route protocol, pilot, run-note, and analysis work to the matching s
 
 - Use schema version 3 for new or modified `experiment.json` files; read version 2 only in compatibility mode. `results/summary.json` remains version 2.
 - Run `scripts/validate_experiment.py <experiment-dir> --strict` for current manifests. Use non-strict validation only when auditing legacy artifacts.
+- For a paper control record, run `scripts/validate_paper.py <paper.json> --project-root <project-root>` as well; check referenced experiment packages separately.
 - Report completed artifacts, remaining evidence gaps, accepted warnings, invalidated evidence, and the next recorded action.
 - If required evidence is unavailable, narrow the claim or stop at the blocked gate instead of filling the gap with assumptions.

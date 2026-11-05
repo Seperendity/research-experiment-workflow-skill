@@ -138,6 +138,19 @@ class ValidateExperimentTests(unittest.TestCase):
         self._write_current()
         return VALIDATOR.validate_experiment(self.experiment_dir)
 
+    def test_duplicate_run_identity_is_rejected(self):
+        self.summary["runs"].append(dict(self.summary["runs"][0]))
+        self.assertTrue(any("duplicate run_id" in e for e in self._validate().errors))
+
+    def test_completed_count_matches_run_records(self):
+        self.summary["aggregate"]["n_completed"] = 0
+        self.assertTrue(any("DONE run records" in e for e in self._validate().errors))
+
+    def test_invalidated_protocol_cannot_retain_pass(self):
+        (self.experiment_dir / "PROTOCOL.md").write_text(
+            "# Protocol\n- **Status**: INVALIDATED\n", encoding="utf-8")
+        self.assertTrue(any("INVALIDATED" in e for e in self._validate().errors))
+
     def test_complete_v3_experiment_passes_strict_validation(self) -> None:
         result = self._validate()
         self.assertEqual([], result.errors)

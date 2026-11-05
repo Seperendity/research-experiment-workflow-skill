@@ -109,3 +109,31 @@ tests/
 本仓库采用 [MIT License](LICENSE)。
 
 `paper-writing-*` 参考文件改编自采用 MIT License 的 [`Master-cai/Research-Paper-Writing-Skills`](https://github.com/Master-cai/Research-Paper-Writing-Skills)。这部分内容仍保留上游版权和许可声明，详见 [`paper-writing-attribution.md`](research-experiment-workflow/references/paper-writing-attribution.md)。
+
+## 研究与论文反馈
+
+面向论文的工作连接问题价值、基线诊断、可证伪候选、开发集筛选、冻结后的正式验证、消融和有预算的审稿循环。工程试运行通过与科学上值得继续投入分别判断。贡献可以是方法、理论、实证发现、效率或应用。
+
+使用已有项目说明或 `research/RESEARCH_PLAN.md` 记录方向和预算，按需使用论文级记录协调跨实验主张与审稿问题；写作仍独立于实验状态机。审查记录所检查的版本，变更后显式复核受影响证据。实验校验器检查 run ID 唯一性、完成数等结构约束，不证明科学结论或论文投稿准备度。
+
+## 有预算的研究迭代与论文校验
+
+控制契约记录候选演化、探索与改进的选择、试验预算，以及接受、修正、淘汰或证据不足的阶段评价。用户要求完成一轮研究时，Skill 会在已授权预算内持续推进到轮次决策；只要求一个产物时，仍按该范围执行。
+
+```text
+使用 $research-experiment-workflow，完成一轮研究迭代。
+最多进行两次开发集试验和六次阶段评价。
+记录晋级标准，保留失败尝试，并完成下一步决策。
+最终测试集保持封存。
+```
+
+论文协调使用版本 1 的 `paper.json`，准确格式见 `research-experiment-workflow/references/research-control.md`。只读校验器检查文件指纹、依赖快照、主张与审查版本、候选引用、轮次预算、问题关闭依据以及 READY 条件：
+
+```bash
+python <skill-dir>/scripts/validate_paper.py research/papers/<paper-id>/paper.json --project-root .
+python <skill-dir>/scripts/validate_experiment.py research/experiments/<experiment-id> --strict
+```
+
+Skill 在更新相关记录时运行这些检查。论文校验不能代替实验校验、执行实验、验证外部数据清单内容或证明科学结论；GPU 和时间预算仍由项目执行工具控制。测试包含合成案例的完整校验流程与失败情况；提示词行为案例是评估规范，不代表已经验证真实代理行为。
+
+阶段反馈设计参考 [ScientistTwo](https://arxiv.org/abs/2609.19644)，同时保留人工监督、最终评价边界和以证据为依据的准备度判断。

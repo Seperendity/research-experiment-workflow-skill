@@ -95,7 +95,7 @@ Use `references/paper-writing-review.md` for the full checklist and workflow.
 
 1. Build a mini-outline before drafting prose.
 2. For each subsection, explicitly include motivation, design, and technical advantage when applicable.
-3. Avoid writing style that looks like incremental patching of a naive baseline.
+3. Describe the actual contribution transparently; presentation must not disguise incremental or unsupported findings.
 4. Keep terminology stable across the full paper.
 5. If a claim cannot be supported by results, weaken or remove the claim.
 6. Before finalizing, append and answer a five-dimension self-review question list, then revise the paper based on unresolved items.
